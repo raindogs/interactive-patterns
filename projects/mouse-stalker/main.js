@@ -128,6 +128,43 @@ function lerp(start, end, t) {
   return start + (end - start) * t;
 }
 
+function drawOrganicPetalPath(context, petal) {
+  const topRadius = petal.ry * random(0.82, 1.18);
+  const bottomRadius = petal.ry * random(0.96, 1.42);
+  const rightWidth = petal.rx * random(0.84, 1.26);
+  const leftWidth = petal.rx * random(0.8, 1.22);
+  const waist = petal.rx * random(0.2, 0.42);
+  const asymmetry = random(-petal.rx * 0.12, petal.rx * 0.12);
+
+  context.beginPath();
+  context.moveTo(0, -topRadius);
+  context.bezierCurveTo(
+    rightWidth * 0.92 + asymmetry,
+    -topRadius * 0.64,
+    rightWidth,
+    bottomRadius * 0.12,
+    waist,
+    bottomRadius
+  );
+  context.bezierCurveTo(
+    waist * 0.3,
+    bottomRadius * 1.12,
+    -waist * 0.3,
+    bottomRadius * 1.12,
+    -waist,
+    bottomRadius
+  );
+  context.bezierCurveTo(
+    -leftWidth,
+    bottomRadius * 0.12,
+    -leftWidth * 0.92 + asymmetry,
+    -topRadius * 0.64,
+    0,
+    -topRadius
+  );
+  context.closePath();
+}
+
 function createClusterSprite(coreRadius, petals, coreColor) {
   const size = Math.ceil(coreRadius * 7 + 80);
   const sprite = document.createElement("canvas");
@@ -179,8 +216,15 @@ function createClusterSprite(coreRadius, petals, coreColor) {
     gradient.addColorStop(1, hsla(petal.color, 0));
 
     sctx.fillStyle = gradient;
-    sctx.beginPath();
-    sctx.ellipse(0, 0, petal.rx, petal.ry, 0, 0, Math.PI * 2);
+    drawOrganicPetalPath(sctx, petal);
+    sctx.fill();
+
+    const haze = sctx.createRadialGradient(0, 0, petal.ry * 0.2, 0, 0, petal.rx * 1.7);
+    haze.addColorStop(0, hsla(petal.color, 0.18));
+    haze.addColorStop(0.6, hsla(petal.color, 0.08));
+    haze.addColorStop(1, hsla(petal.color, 0));
+    sctx.fillStyle = haze;
+    drawOrganicPetalPath(sctx, petal);
     sctx.fill();
     sctx.restore();
   }
@@ -332,8 +376,8 @@ function drawCluster(cluster) {
     const focusPivot = 0.24;
     blur =
       phase <= focusPivot
-        ? lerp(7.2, 2.9, phase / focusPivot)
-        : lerp(2.9, 11.2, (phase - focusPivot) / (1 - focusPivot));
+        ? lerp(8.4, 4.8, phase / focusPivot)
+        : lerp(4.8, 12.0, (phase - focusPivot) / (1 - focusPivot));
     saturation = clamp(0.26 + focusGain * 0.44 - phase * 0.3, 0.1, 0.74);
     brightness = clamp(0.2 + focusGain * 0.2 - phase * 0.16, 0.08, 0.52);
     ctx.filter = `blur(${blur}px) saturate(${saturation}) brightness(${brightness})`;
