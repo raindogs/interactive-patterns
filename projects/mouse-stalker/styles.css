@@ -19,9 +19,9 @@ body {
   height: 100%;
   overflow: hidden;
   background:
-    radial-gradient(circle at 18% 24%, rgba(67, 6, 13, 0.34) 0%, rgba(25, 5, 13, 0.2) 42%, rgba(0, 0, 0, 0) 72%),
-    radial-gradient(circle at 82% 32%, rgba(216, 191, 215, 0.2) 0%, rgba(129, 100, 145, 0.1) 42%, rgba(0, 0, 0, 0) 74%),
-    linear-gradient(115deg, #030207 0%, #06040f 46%, #13040b 100%);
+    radial-gradient(circle at 18% 24%, rgba(133, 10, 24, 0.46) 0%, rgba(44, 6, 20, 0.24) 44%, rgba(0, 0, 0, 0) 74%),
+    radial-gradient(circle at 82% 32%, rgba(238, 154, 231, 0.3) 0%, rgba(170, 84, 171, 0.14) 44%, rgba(0, 0, 0, 0) 76%),
+    linear-gradient(115deg, #040109 0%, #10041a 46%, #19050d 100%);
 }
 
 body {

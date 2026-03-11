@@ -111,17 +111,17 @@ function buildHazeLayer() {
   hctx.fillRect(0, 0, w, h);
 
   const fields = [
-    { x: w * 0.16, y: h * 0.24, radius: Math.max(w, h) * 0.78, hue: 355, sat: 86, light: 22, alpha: 0.24 },
-    { x: w * 0.14, y: h * 0.76, radius: Math.max(w, h) * 0.6, hue: 226, sat: 58, light: 17, alpha: 0.2 },
-    { x: w * 0.84, y: h * 0.34, radius: Math.max(w, h) * 0.58, hue: 298, sat: 31, light: 52, alpha: 0.22 },
-    { x: w * 0.72, y: h * 0.46, radius: Math.max(w, h) * 0.5, hue: 286, sat: 25, light: 63, alpha: 0.15 },
+    { x: w * 0.16, y: h * 0.24, radius: Math.max(w, h) * 0.8, hue: 354, sat: 96, light: 24, alpha: 0.3 },
+    { x: w * 0.13, y: h * 0.76, radius: Math.max(w, h) * 0.62, hue: 228, sat: 76, light: 20, alpha: 0.26 },
+    { x: w * 0.84, y: h * 0.34, radius: Math.max(w, h) * 0.62, hue: 308, sat: 72, light: 52, alpha: 0.3 },
+    { x: w * 0.74, y: h * 0.46, radius: Math.max(w, h) * 0.52, hue: 294, sat: 66, light: 62, alpha: 0.2 },
   ];
 
   for (const field of fields) {
     const gradient = hctx.createRadialGradient(field.x, field.y, 0, field.x, field.y, field.radius);
-    gradient.addColorStop(0, `hsla(${field.hue} ${field.sat}% ${field.light + 12}% / ${field.alpha * 0.96})`);
-    gradient.addColorStop(0.22, `hsla(${field.hue} ${field.sat}% ${field.light + 8}% / ${field.alpha * 0.8})`);
-    gradient.addColorStop(0.5, `hsla(${field.hue} ${field.sat}% ${field.light + 4}% / ${field.alpha * 0.56})`);
+    gradient.addColorStop(0, `hsla(${field.hue} ${field.sat}% ${field.light + 16}% / ${field.alpha * 0.98})`);
+    gradient.addColorStop(0.22, `hsla(${field.hue} ${field.sat}% ${field.light + 12}% / ${field.alpha * 0.84})`);
+    gradient.addColorStop(0.5, `hsla(${field.hue} ${field.sat}% ${field.light + 8}% / ${field.alpha * 0.6})`);
     gradient.addColorStop(0.78, `hsla(${field.hue} ${field.sat}% ${field.light}% / ${field.alpha * 0.24})`);
     gradient.addColorStop(1, "hsla(0 0% 0% / 0)");
     hctx.fillStyle = gradient;
