@@ -6,7 +6,13 @@
 - Slug (`projects/<slug>`): `projects/mouse-stalker`
 - Created: 2026-03-11
 - Owner: kondo
-- Status (`draft` / `in-progress` / `paused` / `done`): draft
+- Status (`draft` / `in-progress` / `paused` / `done`): in-progress
+
+## 起動方法
+
+- Node ビルドは不要
+- 最短確認: `projects/mouse-stalker/index.html` をブラウザで直接開く
+- 推奨確認: ルートで `python3 -m http.server 8000` を実行し、`http://localhost:8000/projects/mouse-stalker/` にアクセス
 
 ## コンセプト
 
@@ -27,8 +33,8 @@
 
 - 言語: HTML / CSS / JavaScript (Vanilla)
 - 描画: Canvas 2D
-- 主要ライブラリ: 未定（原則なしで開始）
-- 外部依存を採用する理由: 2026-03-11 時点では未定
+- 主要ライブラリ: なし
+- 外部依存を採用する理由: 初期プロトタイプは依存ゼロで挙動検証を優先
 
 ## 対応デバイス
 
@@ -103,3 +109,4 @@
 | 2026-03-11 | コンセプトを「浮遊する色」に確定 | 体験軸（深度・湿度・滲み）を明確化するため |
 | 2026-03-11 | 入力方式は Pointer Events を前提にする | Desktop/Mobile を単一実装で扱うため |
 | 2026-03-11 | 初期インタラクション仕様の閾値を固定（lerp 0.12 / 14px / 4.5s / max 180） | 実装着手時の検証軸を明確にするため |
+| 2026-03-11 | 最小プロトタイプは静的 HTML/CSS/JS で実装 | Node ビルドなしで早期検証するため |

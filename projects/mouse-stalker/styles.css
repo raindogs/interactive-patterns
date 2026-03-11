@@ -1,0 +1,75 @@
+:root {
+  --bg-base: #010101;
+  --bg-vignette: #07040a;
+  --text-primary: rgba(242, 238, 245, 0.92);
+  --text-secondary: rgba(202, 195, 214, 0.76);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: radial-gradient(circle at 50% 38%, var(--bg-vignette) 0%, var(--bg-base) 55%, #000 100%);
+}
+
+body {
+  font-family: "Cormorant Garamond", "Hiragino Mincho ProN", "Yu Mincho", serif;
+  color: var(--text-primary);
+  touch-action: none;
+}
+
+#scene {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  display: block;
+  background: transparent;
+}
+
+.hud {
+  position: fixed;
+  left: clamp(14px, 2.2vw, 28px);
+  bottom: clamp(14px, 2.4vh, 30px);
+  z-index: 1;
+  mix-blend-mode: screen;
+  pointer-events: none;
+  text-shadow: 0 0 18px rgba(242, 206, 255, 0.22);
+}
+
+.hud h1 {
+  margin: 0;
+  font-size: clamp(1.4rem, 2.8vw, 2.1rem);
+  letter-spacing: 0.06em;
+  font-weight: 500;
+}
+
+.hud p {
+  margin: 6px 0 0;
+  color: var(--text-secondary);
+  font-size: clamp(0.8rem, 1.6vw, 0.95rem);
+  letter-spacing: 0.04em;
+}
+
+@media (max-width: 768px) {
+  .hud {
+    left: 12px;
+    bottom: 12px;
+  }
+
+  .hud p {
+    max-width: 78vw;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hud p::after {
+    content: " (reduced motion mode)";
+  }
+}
