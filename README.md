@@ -77,4 +77,4 @@ projects/<project-name>/
 
 | Name | Summary | Tech | Path | Status |
 | --- | --- | --- | --- | --- |
-| mouse-stalker | 黒い奥行き空間で花弁状の色彩が滲みながら沈むマウスストーカー習作 | Canvas 2D, Vanilla JS | `projects/mouse-stalker` | draft |
+| mouse-stalker | 黒い奥行き空間で花弁状の色彩が滲みながら沈むマウスストーカー習作 | Canvas 2D, Vanilla JS, Vite, SCSS | `projects/mouse-stalker` | done |

@@ -1,5 +1,9 @@
 # Mouse Stalker UML
 
+関連資料:
+
+- `CODE_READING.md`（読む順番とチェックリスト）
+
 ## 1. 起動から初回描画まで
 
 ```mermaid
