@@ -10,9 +10,22 @@
 
 ## 起動方法
 
-- Node ビルドは不要
-- 最短確認: `projects/mouse-stalker/index.html` をブラウザで直接開く
-- 推奨確認: ルートで `python3 -m http.server 8000` を実行し、`http://localhost:8000/projects/mouse-stalker/` にアクセス
+- 初回のみ依存導入: `cd projects/mouse-stalker && npm install`
+- 開発サーバー: `npm run dev`
+- ビルド（`main.js` / `styles.css` を書き出し）: `npm run build`
+- ビルド成果物確認: `index.html` をブラウザで開く、または `npm run preview`
+
+## ファイル構成
+
+- `src/background/background.js`: 背景専用モジュール（静止ヘイズ + 微粒子ディザ）
+- `src/stalker/stalker.js`: ストーカー専用モジュール（入力処理・花弁生成・描画）
+- `src/main.js`: アプリブートストラップ（モジュール統合）
+- `src/styles/_background.scss`: 背景側スタイル
+- `src/styles/_stalker.scss`: ストーカー/UI側スタイル
+- `src/styles/main.scss`: SCSS集約エントリ
+- `main.js`: Viteビルド出力（単一ファイル）
+- `styles.css`: Viteビルド出力（単一ファイル）
+- `UML.md`: 起動〜描画までの作用機序ドキュメント
 
 ## コンセプト
 
@@ -31,10 +44,11 @@
 
 ## 使用技術（ライブラリ）
 
-- 言語: HTML / CSS / JavaScript (Vanilla)
+- 言語: HTML / SCSS / JavaScript (Vanilla)
 - 描画: Canvas 2D
-- 主要ライブラリ: なし
-- 外部依存を採用する理由: 初期プロトタイプは依存ゼロで挙動検証を優先
+- ビルド: Vite
+- スタイルビルド: Sass (SCSS)
+- 主要ランタイムライブラリ: なし
 
 ## 対応デバイス
 
@@ -113,3 +127,4 @@
 | 2026-03-11 | 色軸をオレンジ/エメラルド/イエローへ変更 | 参照画像の色彩トーンに寄せるため |
 | 2026-03-11 | 沈降表現を「下方向移動」から「奥行きフェード」に変更 | 目指す体験に合わせるため |
 | 2026-03-11 | 背景を時間変化なしの静止ヘイズ + 微粒子ディザに変更 | グラデーション境界の粗さを抑えるため |
+| 2026-03-11 | 背景とストーカーをモジュール分離し、Viteで単一`main.js`へビルドする構成へ移行 | 背景差し替え運用と保守性を両立するため |

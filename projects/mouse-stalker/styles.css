@@ -18,10 +18,7 @@ body {
   width: 100%;
   height: 100%;
   overflow: hidden;
-  background:
-    radial-gradient(circle at 18% 24%, rgba(133, 10, 24, 0.46) 0%, rgba(44, 6, 20, 0.24) 44%, rgba(0, 0, 0, 0) 74%),
-    radial-gradient(circle at 82% 32%, rgba(238, 154, 231, 0.3) 0%, rgba(170, 84, 171, 0.14) 44%, rgba(0, 0, 0, 0) 76%),
-    linear-gradient(115deg, #040109 0%, #10041a 46%, #19050d 100%);
+  background: radial-gradient(circle at 18% 24%, rgba(133, 10, 24, 0.46) 0%, rgba(44, 6, 20, 0.24) 44%, rgba(0, 0, 0, 0) 74%), radial-gradient(circle at 82% 32%, rgba(238, 154, 231, 0.3) 0%, rgba(170, 84, 171, 0.14) 44%, rgba(0, 0, 0, 0) 76%), linear-gradient(115deg, #040109 0%, #10041a 46%, #19050d 100%);
 }
 
 body {
@@ -44,6 +41,7 @@ body {
   left: clamp(14px, 2.2vw, 28px);
   bottom: clamp(14px, 2.4vh, 30px);
   z-index: 1;
+  font-family: "Alumni Sans Pinstripe", sans-serif;
   mix-blend-mode: screen;
   pointer-events: none;
   text-shadow: 0 0 18px rgba(242, 206, 255, 0.22);
@@ -68,12 +66,10 @@ body {
     left: 12px;
     bottom: 12px;
   }
-
   .hud p {
     max-width: 78vw;
   }
 }
-
 @media (prefers-reduced-motion: reduce) {
   .hud p::after {
     content: " (reduced motion mode)";

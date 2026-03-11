@@ -1,0 +1,40 @@
+:root {
+  --bg-base: #020106;
+  --bg-vignette: #180408;
+  --bg-left-crimson: #43060d;
+  --bg-left-blue: #090820;
+  --bg-right-fog: #d8bfd7;
+  --text-primary: rgba(242, 238, 245, 0.92);
+  --text-secondary: rgba(202, 195, 214, 0.76);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 18% 24%, rgba(133, 10, 24, 0.46) 0%, rgba(44, 6, 20, 0.24) 44%, rgba(0, 0, 0, 0) 74%),
+    radial-gradient(circle at 82% 32%, rgba(238, 154, 231, 0.3) 0%, rgba(170, 84, 171, 0.14) 44%, rgba(0, 0, 0, 0) 76%),
+    linear-gradient(115deg, #040109 0%, #10041a 46%, #19050d 100%);
+}
+
+body {
+  font-family: "Cormorant Garamond", "Hiragino Mincho ProN", "Yu Mincho", serif;
+  color: var(--text-primary);
+  touch-action: none;
+}
+
+#scene {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  display: block;
+  background: transparent;
+}
