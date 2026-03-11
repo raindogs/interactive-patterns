@@ -142,13 +142,28 @@ function createClusterSprite(coreRadius, petals, coreColor) {
   sctx.globalCompositeOperation = "screen";
 
   const cloud = sctx.createRadialGradient(0, 0, 0, 0, 0, coreRadius * 2.8);
-  cloud.addColorStop(0, hsla(coreColor, 0.14));
-  cloud.addColorStop(0.55, hsla(coreColor, 0.05));
+  cloud.addColorStop(0, hsla(coreColor, 0.11));
+  cloud.addColorStop(0.55, hsla(coreColor, 0.04));
   cloud.addColorStop(1, hsla(coreColor, 0));
   sctx.fillStyle = cloud;
   sctx.beginPath();
   sctx.arc(0, 0, coreRadius * 2.8, 0, Math.PI * 2);
   sctx.fill();
+
+  for (let i = 0; i < 6; i += 1) {
+    const puffColor = pickColor();
+    const puffRadius = coreRadius * random(1.2, 2.2);
+    const puffX = Math.cos((Math.PI * 2 * i) / 6 + random(-0.6, 0.6)) * coreRadius * random(0.25, 1.05);
+    const puffY = Math.sin((Math.PI * 2 * i) / 6 + random(-0.6, 0.6)) * coreRadius * random(0.25, 1.05);
+    const puff = sctx.createRadialGradient(puffX, puffY, 0, puffX, puffY, puffRadius);
+    puff.addColorStop(0, hsla(puffColor, 0.08));
+    puff.addColorStop(0.65, hsla(puffColor, 0.04));
+    puff.addColorStop(1, hsla(puffColor, 0));
+    sctx.fillStyle = puff;
+    sctx.beginPath();
+    sctx.arc(puffX, puffY, puffRadius, 0, Math.PI * 2);
+    sctx.fill();
+  }
 
   for (const petal of petals) {
     const px = Math.cos(petal.angle) * petal.distance;
@@ -159,8 +174,8 @@ function createClusterSprite(coreRadius, petals, coreColor) {
     sctx.rotate(petal.angle + petal.tilt);
 
     const gradient = sctx.createRadialGradient(0, 0, 1, 0, 0, petal.rx * 1.4);
-    gradient.addColorStop(0, hsla(petal.color, 0.72));
-    gradient.addColorStop(0.58, hsla(petal.color, 0.35));
+    gradient.addColorStop(0, hsla(petal.color, 0.6));
+    gradient.addColorStop(0.58, hsla(petal.color, 0.24));
     gradient.addColorStop(1, hsla(petal.color, 0));
 
     sctx.fillStyle = gradient;
@@ -171,8 +186,8 @@ function createClusterSprite(coreRadius, petals, coreColor) {
   }
 
   const core = sctx.createRadialGradient(0, 0, 0, 0, 0, coreRadius * 1.25);
-  core.addColorStop(0, hsla(coreColor, 0.55));
-  core.addColorStop(0.72, hsla(coreColor, 0.2));
+  core.addColorStop(0, hsla(coreColor, 0.32));
+  core.addColorStop(0.72, hsla(coreColor, 0.12));
   core.addColorStop(1, hsla(coreColor, 0));
 
   sctx.fillStyle = core;
@@ -188,15 +203,15 @@ function createClusterSprite(coreRadius, petals, coreColor) {
 function createCluster(x, y) {
   const petals = [];
   const petalCount = Math.floor(random(5, 10));
-  const coreRadius = random(14, 30);
+  const coreRadius = random(18, 36);
 
   for (let i = 0; i < petalCount; i += 1) {
     const step = (Math.PI * 2 * i) / petalCount;
     petals.push({
       angle: step + random(-0.24, 0.24),
       distance: random(coreRadius * 0.45, coreRadius * 1.35),
-      rx: random(10, 30),
-      ry: random(7, 20),
+      rx: random(12, 36),
+      ry: random(8, 24),
       tilt: random(-0.72, 0.72),
       color: pickColor(),
     });
@@ -289,8 +304,9 @@ function drawCluster(cluster) {
   const depthEase = phase * phase;
   const emergence = clamp(phase / 0.2, 0, 1);
   const alpha = clamp((1 - fadeProgress) * (0.62 - depthEase * 0.24) * emergence, 0, 1);
+  const focusGain = Math.exp(-Math.pow((phase - 0.28) / 0.12, 2));
 
-  const depthScale = 0.74 + depthEase * 1.9;
+  const depthScale = 0.92 + depthEase * 2.25 + focusGain * 0.35;
   const wanderRadius = 2 + depthEase * 12;
   const depthOffset = depthEase * cluster.depthTravel;
   const originX =
@@ -309,15 +325,17 @@ function drawCluster(cluster) {
   ctx.globalCompositeOperation = "screen";
   ctx.globalAlpha = alpha;
 
+  let blur = 0;
+  let saturation = 1;
+  let brightness = 1;
   if ("filter" in ctx) {
     const focusPivot = 0.24;
-    const blur =
+    blur =
       phase <= focusPivot
-        ? lerp(5.8, 1.4, phase / focusPivot)
-        : lerp(1.4, 8.8, (phase - focusPivot) / (1 - focusPivot));
-    const focusGain = Math.exp(-Math.pow((phase - 0.28) / 0.12, 2));
-    const saturation = clamp(0.3 + focusGain * 0.68 - phase * 0.36, 0.1, 0.96);
-    const brightness = clamp(0.22 + focusGain * 0.36 - phase * 0.2, 0.08, 0.72);
+        ? lerp(7.2, 2.9, phase / focusPivot)
+        : lerp(2.9, 11.2, (phase - focusPivot) / (1 - focusPivot));
+    saturation = clamp(0.26 + focusGain * 0.44 - phase * 0.3, 0.1, 0.74);
+    brightness = clamp(0.2 + focusGain * 0.2 - phase * 0.16, 0.08, 0.52);
     ctx.filter = `blur(${blur}px) saturate(${saturation}) brightness(${brightness})`;
   }
 
@@ -325,6 +343,12 @@ function drawCluster(cluster) {
   ctx.drawImage(cluster.sprite, -size * 0.5, -size * 0.5);
 
   if ("filter" in ctx) {
+    const hazeBlur = blur + 3.6;
+    const hazeSaturation = Math.max(0.08, saturation * 0.82);
+    const hazeBrightness = Math.max(0.06, brightness * 0.86);
+    ctx.globalAlpha = alpha * 0.55;
+    ctx.filter = `blur(${hazeBlur}px) saturate(${hazeSaturation}) brightness(${hazeBrightness})`;
+    ctx.drawImage(cluster.sprite, -size * 0.5, -size * 0.5);
     ctx.filter = "none";
   }
 
