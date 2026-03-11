@@ -2,29 +2,28 @@ const canvas = document.getElementById("scene");
 const ctx = canvas.getContext("2d", { alpha: true });
 
 const BASE_CONFIG = {
-  followLerp: 0.12,
-  spawnDistance: 14,
-  lifeMs: 4500,
-  fadeStartMs: 2800,
-  maxClusters: 180,
-  sinkSpeed: 0.018,
-  trailAlpha: 0.28,
+  followLerp: 0.2,
+  spawnDistance: 18,
+  lifeMs: 4300,
+  fadeStartMs: 2300,
+  maxClusters: 120,
+  trailAlpha: 0.22,
 };
 
 const REDUCED_CONFIG = {
-  followLerp: 0.2,
-  spawnDistance: 28,
-  maxClusters: 90,
-  trailAlpha: 0.4,
+  followLerp: 0.28,
+  spawnDistance: 34,
+  maxClusters: 60,
+  trailAlpha: 0.34,
 };
 
 const PALETTE = [
-  { h: 330, s: 86, l: 58 },
-  { h: 302, s: 74, l: 54 },
-  { h: 220, s: 84, l: 60 },
-  { h: 198, s: 72, l: 55 },
-  { h: 44, s: 92, l: 56 },
-  { h: 18, s: 90, l: 57 },
+  { h: 30, s: 92, l: 56 },
+  { h: 42, s: 96, l: 58 },
+  { h: 152, s: 66, l: 43 },
+  { h: 164, s: 72, l: 47 },
+  { h: 24, s: 88, l: 54 },
+  { h: 56, s: 94, l: 60 },
 ];
 
 const pointer = {
@@ -44,6 +43,7 @@ const state = {
   lastSpawnX: pointer.x,
   lastSpawnY: pointer.y,
   lastFrameTime: performance.now(),
+  hazeCanvas: document.createElement("canvas"),
 };
 
 const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -62,8 +62,35 @@ function resizeCanvas() {
   canvas.style.width = `${window.innerWidth}px`;
   canvas.style.height = `${window.innerHeight}px`;
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+  buildHazeLayer();
   ctx.fillStyle = "#000";
   ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
+}
+
+function buildHazeLayer() {
+  const w = window.innerWidth;
+  const h = window.innerHeight;
+  state.hazeCanvas.width = w;
+  state.hazeCanvas.height = h;
+  const hctx = state.hazeCanvas.getContext("2d", { alpha: true });
+
+  hctx.clearRect(0, 0, w, h);
+
+  const fields = [
+    { x: w * 0.38, y: h * 0.28, radius: Math.max(w, h) * 0.68, hue: 24, sat: 84, light: 36, alpha: 0.28 },
+    { x: w * 0.74, y: h * 0.42, radius: Math.max(w, h) * 0.58, hue: 16, sat: 79, light: 34, alpha: 0.24 },
+    { x: w * 0.26, y: h * 0.78, radius: Math.max(w, h) * 0.52, hue: 31, sat: 70, light: 31, alpha: 0.2 },
+  ];
+
+  for (const field of fields) {
+    const gradient = hctx.createRadialGradient(field.x, field.y, 0, field.x, field.y, field.radius);
+    gradient.addColorStop(0, `hsla(${field.hue} ${field.sat}% ${field.light + 14}% / ${field.alpha})`);
+    gradient.addColorStop(0.5, `hsla(${field.hue} ${field.sat}% ${field.light}% / ${field.alpha * 0.55})`);
+    gradient.addColorStop(1, "hsla(0 0% 0% / 0)");
+    hctx.fillStyle = gradient;
+    hctx.fillRect(0, 0, w, h);
+  }
 }
 
 function random(min, max) {
@@ -77,9 +104,9 @@ function clamp(value, min, max) {
 function pickColor() {
   const base = PALETTE[Math.floor(Math.random() * PALETTE.length)];
   return {
-    h: (base.h + random(-9, 9) + 360) % 360,
-    s: clamp(base.s + random(-6, 7), 52, 96),
-    l: clamp(base.l + random(-7, 7), 36, 74),
+    h: (base.h + random(-8, 8) + 360) % 360,
+    s: clamp(base.s + random(-8, 6), 45, 98),
+    l: clamp(base.l + random(-9, 8), 30, 76),
   };
 }
 
@@ -92,23 +119,82 @@ function lerpByFrame(baseLerp, dtMs) {
   return 1 - Math.pow(1 - baseLerp, frameScale);
 }
 
+function createClusterSprite(coreRadius, petals, coreColor) {
+  const size = Math.ceil(coreRadius * 7 + 80);
+  const sprite = document.createElement("canvas");
+  sprite.width = size;
+  sprite.height = size;
+  const sctx = sprite.getContext("2d", { alpha: true });
+  const cx = size * 0.5;
+  const cy = size * 0.5;
+
+  sctx.save();
+  sctx.translate(cx, cy);
+  sctx.globalCompositeOperation = "lighter";
+
+  const cloud = sctx.createRadialGradient(0, 0, 0, 0, 0, coreRadius * 2.8);
+  cloud.addColorStop(0, hsla(coreColor, 0.2));
+  cloud.addColorStop(0.55, hsla(coreColor, 0.09));
+  cloud.addColorStop(1, hsla(coreColor, 0));
+  sctx.fillStyle = cloud;
+  sctx.beginPath();
+  sctx.arc(0, 0, coreRadius * 2.8, 0, Math.PI * 2);
+  sctx.fill();
+
+  for (const petal of petals) {
+    const px = Math.cos(petal.angle) * petal.distance;
+    const py = Math.sin(petal.angle) * petal.distance;
+
+    sctx.save();
+    sctx.translate(px, py);
+    sctx.rotate(petal.angle + petal.tilt);
+
+    const gradient = sctx.createRadialGradient(0, 0, 1, 0, 0, petal.rx * 1.4);
+    gradient.addColorStop(0, hsla(petal.color, 0.84));
+    gradient.addColorStop(0.58, hsla(petal.color, 0.46));
+    gradient.addColorStop(1, hsla(petal.color, 0));
+
+    sctx.fillStyle = gradient;
+    sctx.beginPath();
+    sctx.ellipse(0, 0, petal.rx, petal.ry, 0, 0, Math.PI * 2);
+    sctx.fill();
+    sctx.restore();
+  }
+
+  const core = sctx.createRadialGradient(0, 0, 0, 0, 0, coreRadius * 1.25);
+  core.addColorStop(0, hsla(coreColor, 0.9));
+  core.addColorStop(0.72, hsla(coreColor, 0.3));
+  core.addColorStop(1, hsla(coreColor, 0));
+
+  sctx.fillStyle = core;
+  sctx.beginPath();
+  sctx.arc(0, 0, coreRadius * 1.25, 0, Math.PI * 2);
+  sctx.fill();
+
+  sctx.restore();
+
+  return sprite;
+}
+
 function createCluster(x, y) {
   const petals = [];
   const petalCount = Math.floor(random(5, 10));
-  const coreRadius = random(10, 22);
-  const baseRotation = random(0, Math.PI * 2);
+  const coreRadius = random(11, 24);
 
   for (let i = 0; i < petalCount; i += 1) {
     const step = (Math.PI * 2 * i) / petalCount;
     petals.push({
-      angle: step + random(-0.25, 0.25),
-      distance: random(coreRadius * 0.35, coreRadius * 1.3),
-      rx: random(8, 24),
-      ry: random(5, 16),
-      tilt: random(-0.7, 0.7),
+      angle: step + random(-0.24, 0.24),
+      distance: random(coreRadius * 0.35, coreRadius * 1.35),
+      rx: random(8, 25),
+      ry: random(5, 17),
+      tilt: random(-0.72, 0.72),
       color: pickColor(),
     });
   }
+
+  const coreColor = pickColor();
+  const sprite = createClusterSprite(coreRadius, petals, coreColor);
 
   return {
     x,
@@ -117,14 +203,13 @@ function createCluster(x, y) {
     life: BASE_CONFIG.lifeMs,
     fadeStart: BASE_CONFIG.fadeStartMs,
     driftX: random(-0.01, 0.01),
-    driftY: BASE_CONFIG.sinkSpeed + random(0.008, 0.03),
-    swirl: random(-0.00045, 0.00045),
-    rotation: baseRotation,
-    blur: random(10, 28),
+    driftY: random(-0.01, 0.01),
+    swirl: random(-0.00035, 0.00035),
+    rotation: random(0, Math.PI * 2),
     seed: Math.random() * 999,
-    coreColor: pickColor(),
-    coreRadius,
-    petals,
+    sprite,
+    spriteSize: sprite.width,
+    depth: 0,
   };
 }
 
@@ -149,12 +234,11 @@ function updateClusters(dtMs) {
   for (let i = state.clusters.length - 1; i >= 0; i -= 1) {
     const cluster = state.clusters[i];
     cluster.age += dtMs;
-    const ageRatio = cluster.age / cluster.life;
+    cluster.depth = clamp(cluster.age / cluster.life, 0, 1);
 
     cluster.x += cluster.driftX * dtMs;
     cluster.y += cluster.driftY * dtMs;
     cluster.rotation += cluster.swirl * dtMs;
-    cluster.depth = clamp(ageRatio, 0, 1);
 
     if (cluster.age >= cluster.life) {
       state.clusters.splice(i, 1);
@@ -162,63 +246,47 @@ function updateClusters(dtMs) {
   }
 }
 
+function drawHaze(now) {
+  const driftX = Math.sin(now * 0.00008) * 18;
+  const driftY = Math.cos(now * 0.00006) * 13;
+
+  ctx.save();
+  ctx.globalCompositeOperation = "screen";
+  ctx.globalAlpha = 0.34;
+  ctx.drawImage(state.hazeCanvas, driftX - 12, driftY - 10);
+  ctx.globalAlpha = 0.2;
+  ctx.drawImage(state.hazeCanvas, -driftX * 0.42, -driftY * 0.34);
+  ctx.restore();
+}
+
 function drawCluster(cluster) {
   const fadeWindow = cluster.life - cluster.fadeStart;
   const fadeProgress = fadeWindow <= 0 ? 1 : clamp((cluster.age - cluster.fadeStart) / fadeWindow, 0, 1);
-  const alpha = 1 - fadeProgress;
-  const depthScale = 1.08 - cluster.depth * 0.58;
-  const sinkOffset = cluster.depth * 118;
-  const driftOffset = Math.sin(cluster.age * 0.001 + cluster.seed) * 14 * (0.2 + cluster.depth);
-  const originX = cluster.x + driftOffset;
-  const originY = cluster.y + sinkOffset;
+  const depthEase = cluster.depth * cluster.depth;
+  const alpha = (1 - fadeProgress) * (1 - depthEase * 0.45);
+
+  const depthScale = 1.15 - depthEase * 0.72;
+  const wanderRadius = 4 + depthEase * 14;
+  const originX = cluster.x + Math.sin(cluster.seed + cluster.age * 0.00052) * wanderRadius;
+  const originY = cluster.y + Math.cos(cluster.seed * 1.3 + cluster.age * 0.00041) * wanderRadius;
 
   ctx.save();
   ctx.translate(originX, originY);
   ctx.rotate(cluster.rotation);
   ctx.scale(depthScale, depthScale);
   ctx.globalCompositeOperation = "lighter";
+  ctx.globalAlpha = alpha;
 
-  const cloud = ctx.createRadialGradient(0, 0, 0, 0, 0, cluster.coreRadius * 2.9);
-  cloud.addColorStop(0, hsla(cluster.coreColor, 0.18 * alpha));
-  cloud.addColorStop(0.5, hsla(cluster.coreColor, 0.08 * alpha));
-  cloud.addColorStop(1, hsla(cluster.coreColor, 0));
-  ctx.fillStyle = cloud;
-  ctx.beginPath();
-  ctx.arc(0, 0, cluster.coreRadius * 2.9, 0, Math.PI * 2);
-  ctx.fill();
-
-  ctx.shadowBlur = cluster.blur * (1 - cluster.depth * 0.55);
-  ctx.shadowColor = hsla(cluster.coreColor, 0.38 * alpha);
-
-  for (const petal of cluster.petals) {
-    const px = Math.cos(petal.angle) * petal.distance;
-    const py = Math.sin(petal.angle) * petal.distance;
-
-    ctx.save();
-    ctx.translate(px, py);
-    ctx.rotate(petal.angle + petal.tilt);
-
-    const gradient = ctx.createRadialGradient(0, 0, 0.8, 0, 0, petal.rx * 1.35);
-    gradient.addColorStop(0, hsla(petal.color, 0.78 * alpha));
-    gradient.addColorStop(0.55, hsla(petal.color, 0.42 * alpha));
-    gradient.addColorStop(1, hsla(petal.color, 0));
-
-    ctx.fillStyle = gradient;
-    ctx.beginPath();
-    ctx.ellipse(0, 0, petal.rx, petal.ry, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.restore();
+  if ("filter" in ctx) {
+    ctx.filter = `blur(${depthEase * 2.4}px)`;
   }
 
-  const core = ctx.createRadialGradient(0, 0, 0, 0, 0, cluster.coreRadius * 1.4);
-  core.addColorStop(0, hsla(cluster.coreColor, 0.9 * alpha));
-  core.addColorStop(0.7, hsla(cluster.coreColor, 0.2 * alpha));
-  core.addColorStop(1, hsla(cluster.coreColor, 0));
+  const size = cluster.spriteSize;
+  ctx.drawImage(cluster.sprite, -size * 0.5, -size * 0.5);
 
-  ctx.fillStyle = core;
-  ctx.beginPath();
-  ctx.arc(0, 0, cluster.coreRadius * 1.35, 0, Math.PI * 2);
-  ctx.fill();
+  if ("filter" in ctx) {
+    ctx.filter = "none";
+  }
 
   ctx.restore();
 }
@@ -228,16 +296,16 @@ function drawStalkerGlow() {
     return;
   }
 
-  const glow = ctx.createRadialGradient(stalker.x, stalker.y, 0, stalker.x, stalker.y, 34);
-  glow.addColorStop(0, "rgba(255, 255, 255, 0.26)");
-  glow.addColorStop(0.3, "rgba(235, 176, 255, 0.11)");
+  const glow = ctx.createRadialGradient(stalker.x, stalker.y, 0, stalker.x, stalker.y, 40);
+  glow.addColorStop(0, "rgba(255, 229, 173, 0.33)");
+  glow.addColorStop(0.32, "rgba(255, 153, 72, 0.16)");
   glow.addColorStop(1, "rgba(0, 0, 0, 0)");
 
   ctx.save();
   ctx.globalCompositeOperation = "screen";
   ctx.fillStyle = glow;
   ctx.beginPath();
-  ctx.arc(stalker.x, stalker.y, 34, 0, Math.PI * 2);
+  ctx.arc(stalker.x, stalker.y, 40, 0, Math.PI * 2);
   ctx.fill();
   ctx.restore();
 }
@@ -261,8 +329,9 @@ function animate(now) {
   ctx.fillStyle = `rgba(0, 0, 0, ${cfg.trailAlpha})`;
   ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
 
-  const drawOrder = state.clusters.slice().sort((a, b) => b.depth - a.depth);
-  for (const cluster of drawOrder) {
+  drawHaze(now);
+
+  for (const cluster of state.clusters) {
     drawCluster(cluster);
   }
 
@@ -290,6 +359,11 @@ canvas.addEventListener("pointerdown", (event) => {
 });
 
 canvas.addEventListener("pointermove", (event) => {
+  // Touch devices spawn only while actively pressing to avoid over-generation.
+  if (event.pointerType === "touch" && !pointer.engaged) {
+    return;
+  }
+
   engagePointer(event.clientX, event.clientY);
 });
 
@@ -301,9 +375,15 @@ canvas.addEventListener("pointercancel", () => {
   pointer.engaged = false;
 });
 
-motionQuery.addEventListener("change", (event) => {
-  reducedMotion = event.matches;
-});
+if (typeof motionQuery.addEventListener === "function") {
+  motionQuery.addEventListener("change", (event) => {
+    reducedMotion = event.matches;
+  });
+} else if (typeof motionQuery.addListener === "function") {
+  motionQuery.addListener((event) => {
+    reducedMotion = event.matches;
+  });
+}
 
 window.addEventListener("resize", resizeCanvas);
 
