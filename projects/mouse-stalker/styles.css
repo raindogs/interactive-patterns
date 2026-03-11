@@ -1,6 +1,9 @@
 :root {
-  --bg-base: #010101;
-  --bg-vignette: #120703;
+  --bg-base: #020106;
+  --bg-vignette: #180408;
+  --bg-left-crimson: #43060d;
+  --bg-left-blue: #090820;
+  --bg-right-fog: #d8bfd7;
   --text-primary: rgba(242, 238, 245, 0.92);
   --text-secondary: rgba(202, 195, 214, 0.76);
 }
@@ -15,7 +18,11 @@ body {
   width: 100%;
   height: 100%;
   overflow: hidden;
-  background: radial-gradient(circle at 42% 34%, #221007 0%, var(--bg-vignette) 34%, var(--bg-base) 64%, #000 100%);
+  background:
+    radial-gradient(circle at 82% 30%, rgba(216, 191, 215, 0.36) 0%, rgba(128, 96, 136, 0.16) 32%, rgba(0, 0, 0, 0) 58%),
+    radial-gradient(circle at 18% 20%, rgba(67, 6, 13, 0.9) 0%, rgba(33, 4, 12, 0.75) 34%, rgba(0, 0, 0, 0) 62%),
+    radial-gradient(circle at 10% 76%, rgba(9, 8, 32, 0.52) 0%, rgba(2, 1, 8, 0.22) 40%, rgba(0, 0, 0, 0) 70%),
+    radial-gradient(circle at 44% 44%, var(--bg-vignette) 0%, var(--bg-base) 62%, #000 100%);
 }
 
 body {

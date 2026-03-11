@@ -2,30 +2,31 @@ const canvas = document.getElementById("scene");
 const ctx = canvas.getContext("2d", { alpha: true });
 
 const BASE_CONFIG = {
-  followLerp: 0.085,
-  spawnDistance: 46,
-  spawnCooldownMs: 120,
+  followLerp: 0.05,
+  spawnDistance: 68,
+  spawnCooldownMs: 220,
   lifeMs: 5200,
   fadeStartMs: 2900,
-  maxClusters: 80,
-  trailAlpha: 0.16,
+  maxClusters: 70,
+  trailAlpha: 0.14,
 };
 
 const REDUCED_CONFIG = {
-  followLerp: 0.14,
-  spawnDistance: 70,
-  spawnCooldownMs: 220,
-  maxClusters: 40,
-  trailAlpha: 0.28,
+  followLerp: 0.085,
+  spawnDistance: 94,
+  spawnCooldownMs: 320,
+  maxClusters: 32,
+  trailAlpha: 0.24,
 };
 
 const PALETTE = [
-  { h: 30, s: 94, l: 47 },
-  { h: 40, s: 96, l: 49 },
-  { h: 150, s: 74, l: 36 },
-  { h: 164, s: 78, l: 39 },
-  { h: 22, s: 90, l: 44 },
-  { h: 54, s: 95, l: 50 },
+  { h: 22, s: 94, l: 43 },
+  { h: 33, s: 95, l: 46 },
+  { h: 184, s: 78, l: 38 },
+  { h: 168, s: 76, l: 34 },
+  { h: 54, s: 94, l: 48 },
+  { h: 332, s: 82, l: 40 },
+  { h: 302, s: 76, l: 38 },
 ];
 
 const pointer = {
@@ -81,9 +82,10 @@ function buildHazeLayer() {
   hctx.clearRect(0, 0, w, h);
 
   const fields = [
-    { x: w * 0.38, y: h * 0.28, radius: Math.max(w, h) * 0.68, hue: 24, sat: 84, light: 29, alpha: 0.2 },
-    { x: w * 0.74, y: h * 0.42, radius: Math.max(w, h) * 0.58, hue: 16, sat: 79, light: 27, alpha: 0.16 },
-    { x: w * 0.26, y: h * 0.78, radius: Math.max(w, h) * 0.52, hue: 31, sat: 70, light: 24, alpha: 0.14 },
+    { x: w * 0.18, y: h * 0.2, radius: Math.max(w, h) * 0.74, hue: 355, sat: 86, light: 24, alpha: 0.26 },
+    { x: w * 0.16, y: h * 0.74, radius: Math.max(w, h) * 0.58, hue: 226, sat: 58, light: 18, alpha: 0.22 },
+    { x: w * 0.82, y: h * 0.34, radius: Math.max(w, h) * 0.56, hue: 298, sat: 31, light: 52, alpha: 0.24 },
+    { x: w * 0.72, y: h * 0.45, radius: Math.max(w, h) * 0.48, hue: 286, sat: 25, light: 64, alpha: 0.16 },
   ];
 
   for (const field of fields) {
@@ -273,9 +275,9 @@ function drawHaze(now) {
 
   ctx.save();
   ctx.globalCompositeOperation = "screen";
-  ctx.globalAlpha = 0.24;
+  ctx.globalAlpha = 0.2;
   ctx.drawImage(state.hazeCanvas, driftX - 12, driftY - 10);
-  ctx.globalAlpha = 0.14;
+  ctx.globalAlpha = 0.12;
   ctx.drawImage(state.hazeCanvas, -driftX * 0.42, -driftY * 0.34);
   ctx.restore();
 }
@@ -285,8 +287,8 @@ function drawCluster(cluster) {
   const fadeProgress = fadeWindow <= 0 ? 1 : clamp((cluster.age - cluster.fadeStart) / fadeWindow, 0, 1);
   const phase = cluster.depth;
   const depthEase = phase * phase;
-  const emergence = clamp(phase / 0.14, 0, 1);
-  const alpha = clamp((1 - fadeProgress) * (0.72 - depthEase * 0.3) * emergence, 0, 1);
+  const emergence = clamp(phase / 0.2, 0, 1);
+  const alpha = clamp((1 - fadeProgress) * (0.62 - depthEase * 0.24) * emergence, 0, 1);
 
   const depthScale = 0.74 + depthEase * 1.9;
   const wanderRadius = 2 + depthEase * 12;
@@ -308,14 +310,14 @@ function drawCluster(cluster) {
   ctx.globalAlpha = alpha;
 
   if ("filter" in ctx) {
-    const focusPivot = 0.26;
+    const focusPivot = 0.24;
     const blur =
       phase <= focusPivot
-        ? lerp(5, 1.1, phase / focusPivot)
-        : lerp(1.1, 8.2, (phase - focusPivot) / (1 - focusPivot));
-    const focusGain = Math.exp(-Math.pow((phase - 0.3) / 0.13, 2));
-    const saturation = clamp(0.36 + focusGain * 0.64 - phase * 0.34, 0.12, 0.95);
-    const brightness = clamp(0.26 + focusGain * 0.42 - phase * 0.22, 0.1, 0.82);
+        ? lerp(5.8, 1.4, phase / focusPivot)
+        : lerp(1.4, 8.8, (phase - focusPivot) / (1 - focusPivot));
+    const focusGain = Math.exp(-Math.pow((phase - 0.28) / 0.12, 2));
+    const saturation = clamp(0.3 + focusGain * 0.68 - phase * 0.36, 0.1, 0.96);
+    const brightness = clamp(0.22 + focusGain * 0.36 - phase * 0.2, 0.08, 0.72);
     ctx.filter = `blur(${blur}px) saturate(${saturation}) brightness(${brightness})`;
   }
 
@@ -335,8 +337,8 @@ function drawStalkerGlow() {
   }
 
   const glow = ctx.createRadialGradient(stalker.x, stalker.y, 0, stalker.x, stalker.y, 24);
-  glow.addColorStop(0, "rgba(255, 180, 96, 0.08)");
-  glow.addColorStop(0.32, "rgba(255, 132, 48, 0.04)");
+  glow.addColorStop(0, "rgba(255, 180, 96, 0.045)");
+  glow.addColorStop(0.32, "rgba(255, 132, 48, 0.02)");
   glow.addColorStop(1, "rgba(0, 0, 0, 0)");
 
   ctx.save();

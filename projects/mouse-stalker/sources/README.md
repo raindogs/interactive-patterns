@@ -7,4 +7,4 @@
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | src-001 | image | Dries Van Noten floral reference | sources/images/20260311_van-noten-color_01.avif | 2026-03-11 | editorial reference (local copy) | palette draft | 高彩度・高コントラスト配色の参照 |
 | src-002 | image | Floral collage reference | sources/images/20260311_floral-collage_02.jpg | 2026-03-11 | reference only (local copy) | depth moodboard | 暗部と花色の密度感の参照 |
-
+| src-003 | image | van-noten-po-rs22-0001-1632980355 | sources/images/van-noten-po-rs22-0001-1632980355.png | 2026-03-11 | reference only (local copy) | background + palette | 左赤黒/右霧感と花弁配色の主参照 |
