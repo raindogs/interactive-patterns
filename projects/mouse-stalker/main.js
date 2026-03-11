@@ -119,6 +119,10 @@ function lerpByFrame(baseLerp, dtMs) {
   return 1 - Math.pow(1 - baseLerp, frameScale);
 }
 
+function lerp(start, end, t) {
+  return start + (end - start) * t;
+}
+
 function createClusterSprite(coreRadius, petals, coreColor) {
   const size = Math.ceil(coreRadius * 7 + 80);
   const sprite = document.createElement("canvas");
@@ -195,6 +199,11 @@ function createCluster(x, y) {
 
   const coreColor = pickColor();
   const sprite = createClusterSprite(coreRadius, petals, coreColor);
+  const vanishX = window.innerWidth * 0.5 + random(-window.innerWidth * 0.08, window.innerWidth * 0.08);
+  const vanishY = window.innerHeight * 0.5 + random(-window.innerHeight * 0.08, window.innerHeight * 0.08);
+  const toVanishX = vanishX - x;
+  const toVanishY = vanishY - y;
+  const toVanishLength = Math.hypot(toVanishX, toVanishY) || 1;
 
   return {
     x,
@@ -204,10 +213,12 @@ function createCluster(x, y) {
     fadeStart: BASE_CONFIG.fadeStartMs,
     driftX: random(-0.007, 0.007),
     driftY: random(-0.004, 0.004),
-    sinkY: random(0.008, 0.02),
     swirl: random(-0.00035, 0.00035),
     rotation: random(0, Math.PI * 2),
     seed: Math.random() * 999,
+    depthDirX: toVanishX / toVanishLength,
+    depthDirY: toVanishY / toVanishLength,
+    depthTravel: random(24, 92),
     sprite,
     spriteSize: sprite.width,
     depth: 0,
@@ -239,7 +250,6 @@ function updateClusters(dtMs) {
 
     cluster.x += cluster.driftX * dtMs;
     cluster.y += cluster.driftY * dtMs;
-    cluster.y += cluster.sinkY * dtMs;
     cluster.rotation += cluster.swirl * dtMs;
 
     if (cluster.age >= cluster.life) {
@@ -264,14 +274,21 @@ function drawHaze(now) {
 function drawCluster(cluster) {
   const fadeWindow = cluster.life - cluster.fadeStart;
   const fadeProgress = fadeWindow <= 0 ? 1 : clamp((cluster.age - cluster.fadeStart) / fadeWindow, 0, 1);
-  const depthEase = cluster.depth * cluster.depth;
-  const alpha = clamp((1 - fadeProgress) * (1 - depthEase * 0.72), 0, 1);
+  const phase = cluster.depth;
+  const depthEase = phase * phase;
+  const alpha = clamp((1 - fadeProgress) * (0.85 - depthEase * 0.36), 0, 1);
 
-  const depthScale = 0.58 + depthEase * 1.32;
-  const wanderRadius = 3 + depthEase * 16;
-  const originX = cluster.x + Math.sin(cluster.seed + cluster.age * 0.00052) * wanderRadius;
-  const sinkOffset = depthEase * 88;
-  const originY = cluster.y + sinkOffset + Math.cos(cluster.seed * 1.3 + cluster.age * 0.00041) * wanderRadius;
+  const depthScale = 0.62 + depthEase * 1.46;
+  const wanderRadius = 2 + depthEase * 12;
+  const depthOffset = depthEase * cluster.depthTravel;
+  const originX =
+    cluster.x +
+    cluster.depthDirX * depthOffset +
+    Math.sin(cluster.seed + cluster.age * 0.00052) * wanderRadius;
+  const originY =
+    cluster.y +
+    cluster.depthDirY * depthOffset +
+    Math.cos(cluster.seed * 1.3 + cluster.age * 0.00041) * wanderRadius;
 
   ctx.save();
   ctx.translate(originX, originY);
@@ -281,9 +298,14 @@ function drawCluster(cluster) {
   ctx.globalAlpha = alpha;
 
   if ("filter" in ctx) {
-    const blur = 0.2 + depthEase * 3.4;
-    const saturation = 1 - depthEase * 0.78;
-    const brightness = 1 - depthEase * 0.54;
+    const focusPivot = 0.34;
+    const blur =
+      phase <= focusPivot
+        ? lerp(3.6, 0.7, phase / focusPivot)
+        : lerp(0.7, 5.8, (phase - focusPivot) / (1 - focusPivot));
+    const focusGain = Math.exp(-Math.pow((phase - 0.34) / 0.2, 2));
+    const saturation = clamp(0.34 + focusGain * 0.58 - phase * 0.32, 0.14, 0.9);
+    const brightness = clamp(0.32 + focusGain * 0.4 - phase * 0.28, 0.12, 0.85);
     ctx.filter = `blur(${blur}px) saturate(${saturation}) brightness(${brightness})`;
   }
 
