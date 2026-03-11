@@ -19,10 +19,9 @@ body {
   height: 100%;
   overflow: hidden;
   background:
-    radial-gradient(circle at 82% 30%, rgba(216, 191, 215, 0.36) 0%, rgba(128, 96, 136, 0.16) 32%, rgba(0, 0, 0, 0) 58%),
-    radial-gradient(circle at 18% 20%, rgba(67, 6, 13, 0.9) 0%, rgba(33, 4, 12, 0.75) 34%, rgba(0, 0, 0, 0) 62%),
-    radial-gradient(circle at 10% 76%, rgba(9, 8, 32, 0.52) 0%, rgba(2, 1, 8, 0.22) 40%, rgba(0, 0, 0, 0) 70%),
-    radial-gradient(circle at 44% 44%, var(--bg-vignette) 0%, var(--bg-base) 62%, #000 100%);
+    radial-gradient(circle at 18% 24%, rgba(67, 6, 13, 0.34) 0%, rgba(25, 5, 13, 0.2) 42%, rgba(0, 0, 0, 0) 72%),
+    radial-gradient(circle at 82% 32%, rgba(216, 191, 215, 0.2) 0%, rgba(129, 100, 145, 0.1) 42%, rgba(0, 0, 0, 0) 74%),
+    linear-gradient(115deg, #030207 0%, #06040f 46%, #13040b 100%);
 }
 
 body {

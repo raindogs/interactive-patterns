@@ -19,6 +19,11 @@ const REDUCED_CONFIG = {
   trailAlpha: 0.24,
 };
 
+const BACKGROUND_CONFIG = {
+  noiseTileSize: 128,
+  noiseAlpha: 0.032,
+};
+
 const PALETTE = [
   { h: 22, s: 94, l: 43 },
   { h: 33, s: 95, l: 46 },
@@ -48,6 +53,7 @@ const state = {
   lastSpawnAt: 0,
   lastFrameTime: performance.now(),
   hazeCanvas: document.createElement("canvas"),
+  hazeNoiseTile: document.createElement("canvas"),
 };
 
 const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -72,6 +78,27 @@ function resizeCanvas() {
   ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
 }
 
+function createBackgroundNoiseTile() {
+  const tileSize = BACKGROUND_CONFIG.noiseTileSize;
+  const tile = state.hazeNoiseTile;
+  tile.width = tileSize;
+  tile.height = tileSize;
+  const tctx = tile.getContext("2d", { alpha: true });
+  const image = tctx.createImageData(tileSize, tileSize);
+  const { data } = image;
+
+  for (let i = 0; i < data.length; i += 4) {
+    const gray = Math.floor(random(120, 136));
+    const alpha = Math.floor(random(16, 34));
+    data[i] = gray;
+    data[i + 1] = gray;
+    data[i + 2] = gray;
+    data[i + 3] = alpha;
+  }
+
+  tctx.putImageData(image, 0, 0);
+}
+
 function buildHazeLayer() {
   const w = window.innerWidth;
   const h = window.innerHeight;
@@ -80,22 +107,38 @@ function buildHazeLayer() {
   const hctx = state.hazeCanvas.getContext("2d", { alpha: true });
 
   hctx.clearRect(0, 0, w, h);
+  hctx.fillStyle = "#000";
+  hctx.fillRect(0, 0, w, h);
 
   const fields = [
-    { x: w * 0.18, y: h * 0.2, radius: Math.max(w, h) * 0.74, hue: 355, sat: 86, light: 24, alpha: 0.26 },
-    { x: w * 0.16, y: h * 0.74, radius: Math.max(w, h) * 0.58, hue: 226, sat: 58, light: 18, alpha: 0.22 },
-    { x: w * 0.82, y: h * 0.34, radius: Math.max(w, h) * 0.56, hue: 298, sat: 31, light: 52, alpha: 0.24 },
-    { x: w * 0.72, y: h * 0.45, radius: Math.max(w, h) * 0.48, hue: 286, sat: 25, light: 64, alpha: 0.16 },
+    { x: w * 0.16, y: h * 0.24, radius: Math.max(w, h) * 0.78, hue: 355, sat: 86, light: 22, alpha: 0.24 },
+    { x: w * 0.14, y: h * 0.76, radius: Math.max(w, h) * 0.6, hue: 226, sat: 58, light: 17, alpha: 0.2 },
+    { x: w * 0.84, y: h * 0.34, radius: Math.max(w, h) * 0.58, hue: 298, sat: 31, light: 52, alpha: 0.22 },
+    { x: w * 0.72, y: h * 0.46, radius: Math.max(w, h) * 0.5, hue: 286, sat: 25, light: 63, alpha: 0.15 },
   ];
 
   for (const field of fields) {
     const gradient = hctx.createRadialGradient(field.x, field.y, 0, field.x, field.y, field.radius);
-    gradient.addColorStop(0, `hsla(${field.hue} ${field.sat}% ${field.light + 14}% / ${field.alpha})`);
-    gradient.addColorStop(0.5, `hsla(${field.hue} ${field.sat}% ${field.light}% / ${field.alpha * 0.55})`);
+    gradient.addColorStop(0, `hsla(${field.hue} ${field.sat}% ${field.light + 12}% / ${field.alpha * 0.96})`);
+    gradient.addColorStop(0.22, `hsla(${field.hue} ${field.sat}% ${field.light + 8}% / ${field.alpha * 0.8})`);
+    gradient.addColorStop(0.5, `hsla(${field.hue} ${field.sat}% ${field.light + 4}% / ${field.alpha * 0.56})`);
+    gradient.addColorStop(0.78, `hsla(${field.hue} ${field.sat}% ${field.light}% / ${field.alpha * 0.24})`);
     gradient.addColorStop(1, "hsla(0 0% 0% / 0)");
     hctx.fillStyle = gradient;
     hctx.fillRect(0, 0, w, h);
   }
+
+  createBackgroundNoiseTile();
+  const tile = state.hazeNoiseTile;
+  hctx.save();
+  hctx.globalCompositeOperation = "source-over";
+  hctx.globalAlpha = BACKGROUND_CONFIG.noiseAlpha;
+  for (let y = 0; y < h; y += tile.height) {
+    for (let x = 0; x < w; x += tile.width) {
+      hctx.drawImage(tile, x, y);
+    }
+  }
+  hctx.restore();
 }
 
 function random(min, max) {
@@ -328,16 +371,11 @@ function updateClusters(dtMs) {
   }
 }
 
-function drawHaze(now) {
-  const driftX = Math.sin(now * 0.00008) * 18;
-  const driftY = Math.cos(now * 0.00006) * 13;
-
+function drawHaze() {
   ctx.save();
-  ctx.globalCompositeOperation = "screen";
-  ctx.globalAlpha = 0.2;
-  ctx.drawImage(state.hazeCanvas, driftX - 12, driftY - 10);
-  ctx.globalAlpha = 0.12;
-  ctx.drawImage(state.hazeCanvas, -driftX * 0.42, -driftY * 0.34);
+  ctx.globalCompositeOperation = "source-over";
+  ctx.globalAlpha = 1;
+  ctx.drawImage(state.hazeCanvas, 0, 0);
   ctx.restore();
 }
 
@@ -437,7 +475,7 @@ function animate(now) {
   ctx.fillStyle = `rgba(0, 0, 0, ${cfg.trailAlpha})`;
   ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
 
-  drawHaze(now);
+  drawHaze();
 
   for (const cluster of state.clusters) {
     drawCluster(cluster);
