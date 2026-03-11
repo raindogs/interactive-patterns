@@ -18,12 +18,12 @@ const REDUCED_CONFIG = {
 };
 
 const PALETTE = [
-  { h: 30, s: 92, l: 56 },
-  { h: 42, s: 96, l: 58 },
-  { h: 152, s: 66, l: 43 },
-  { h: 164, s: 72, l: 47 },
-  { h: 24, s: 88, l: 54 },
-  { h: 56, s: 94, l: 60 },
+  { h: 30, s: 94, l: 47 },
+  { h: 40, s: 96, l: 49 },
+  { h: 150, s: 74, l: 36 },
+  { h: 164, s: 78, l: 39 },
+  { h: 22, s: 90, l: 44 },
+  { h: 54, s: 95, l: 50 },
 ];
 
 const pointer = {
@@ -105,8 +105,8 @@ function pickColor() {
   const base = PALETTE[Math.floor(Math.random() * PALETTE.length)];
   return {
     h: (base.h + random(-8, 8) + 360) % 360,
-    s: clamp(base.s + random(-8, 6), 45, 98),
-    l: clamp(base.l + random(-9, 8), 30, 76),
+    s: clamp(base.s + random(-7, 5), 52, 99),
+    l: clamp(base.l + random(-10, 6), 20, 58),
   };
 }
 
@@ -130,11 +130,11 @@ function createClusterSprite(coreRadius, petals, coreColor) {
 
   sctx.save();
   sctx.translate(cx, cy);
-  sctx.globalCompositeOperation = "lighter";
+  sctx.globalCompositeOperation = "screen";
 
   const cloud = sctx.createRadialGradient(0, 0, 0, 0, 0, coreRadius * 2.8);
-  cloud.addColorStop(0, hsla(coreColor, 0.2));
-  cloud.addColorStop(0.55, hsla(coreColor, 0.09));
+  cloud.addColorStop(0, hsla(coreColor, 0.14));
+  cloud.addColorStop(0.55, hsla(coreColor, 0.05));
   cloud.addColorStop(1, hsla(coreColor, 0));
   sctx.fillStyle = cloud;
   sctx.beginPath();
@@ -150,8 +150,8 @@ function createClusterSprite(coreRadius, petals, coreColor) {
     sctx.rotate(petal.angle + petal.tilt);
 
     const gradient = sctx.createRadialGradient(0, 0, 1, 0, 0, petal.rx * 1.4);
-    gradient.addColorStop(0, hsla(petal.color, 0.84));
-    gradient.addColorStop(0.58, hsla(petal.color, 0.46));
+    gradient.addColorStop(0, hsla(petal.color, 0.72));
+    gradient.addColorStop(0.58, hsla(petal.color, 0.35));
     gradient.addColorStop(1, hsla(petal.color, 0));
 
     sctx.fillStyle = gradient;
@@ -162,8 +162,8 @@ function createClusterSprite(coreRadius, petals, coreColor) {
   }
 
   const core = sctx.createRadialGradient(0, 0, 0, 0, 0, coreRadius * 1.25);
-  core.addColorStop(0, hsla(coreColor, 0.9));
-  core.addColorStop(0.72, hsla(coreColor, 0.3));
+  core.addColorStop(0, hsla(coreColor, 0.55));
+  core.addColorStop(0.72, hsla(coreColor, 0.2));
   core.addColorStop(1, hsla(coreColor, 0));
 
   sctx.fillStyle = core;
@@ -179,15 +179,15 @@ function createClusterSprite(coreRadius, petals, coreColor) {
 function createCluster(x, y) {
   const petals = [];
   const petalCount = Math.floor(random(5, 10));
-  const coreRadius = random(11, 24);
+  const coreRadius = random(8, 15);
 
   for (let i = 0; i < petalCount; i += 1) {
     const step = (Math.PI * 2 * i) / petalCount;
     petals.push({
       angle: step + random(-0.24, 0.24),
-      distance: random(coreRadius * 0.35, coreRadius * 1.35),
-      rx: random(8, 25),
-      ry: random(5, 17),
+      distance: random(coreRadius * 0.45, coreRadius * 1.15),
+      rx: random(5, 16),
+      ry: random(3, 11),
       tilt: random(-0.72, 0.72),
       color: pickColor(),
     });
@@ -202,8 +202,9 @@ function createCluster(x, y) {
     age: 0,
     life: BASE_CONFIG.lifeMs,
     fadeStart: BASE_CONFIG.fadeStartMs,
-    driftX: random(-0.01, 0.01),
-    driftY: random(-0.01, 0.01),
+    driftX: random(-0.007, 0.007),
+    driftY: random(-0.004, 0.004),
+    sinkY: random(0.008, 0.02),
     swirl: random(-0.00035, 0.00035),
     rotation: random(0, Math.PI * 2),
     seed: Math.random() * 999,
@@ -238,6 +239,7 @@ function updateClusters(dtMs) {
 
     cluster.x += cluster.driftX * dtMs;
     cluster.y += cluster.driftY * dtMs;
+    cluster.y += cluster.sinkY * dtMs;
     cluster.rotation += cluster.swirl * dtMs;
 
     if (cluster.age >= cluster.life) {
@@ -263,22 +265,26 @@ function drawCluster(cluster) {
   const fadeWindow = cluster.life - cluster.fadeStart;
   const fadeProgress = fadeWindow <= 0 ? 1 : clamp((cluster.age - cluster.fadeStart) / fadeWindow, 0, 1);
   const depthEase = cluster.depth * cluster.depth;
-  const alpha = (1 - fadeProgress) * (1 - depthEase * 0.45);
+  const alpha = clamp((1 - fadeProgress) * (1 - depthEase * 0.72), 0, 1);
 
-  const depthScale = 1.15 - depthEase * 0.72;
-  const wanderRadius = 4 + depthEase * 14;
+  const depthScale = 0.58 + depthEase * 1.32;
+  const wanderRadius = 3 + depthEase * 16;
   const originX = cluster.x + Math.sin(cluster.seed + cluster.age * 0.00052) * wanderRadius;
-  const originY = cluster.y + Math.cos(cluster.seed * 1.3 + cluster.age * 0.00041) * wanderRadius;
+  const sinkOffset = depthEase * 88;
+  const originY = cluster.y + sinkOffset + Math.cos(cluster.seed * 1.3 + cluster.age * 0.00041) * wanderRadius;
 
   ctx.save();
   ctx.translate(originX, originY);
   ctx.rotate(cluster.rotation);
   ctx.scale(depthScale, depthScale);
-  ctx.globalCompositeOperation = "lighter";
+  ctx.globalCompositeOperation = "screen";
   ctx.globalAlpha = alpha;
 
   if ("filter" in ctx) {
-    ctx.filter = `blur(${depthEase * 2.4}px)`;
+    const blur = 0.2 + depthEase * 3.4;
+    const saturation = 1 - depthEase * 0.78;
+    const brightness = 1 - depthEase * 0.54;
+    ctx.filter = `blur(${blur}px) saturate(${saturation}) brightness(${brightness})`;
   }
 
   const size = cluster.spriteSize;
@@ -296,16 +302,16 @@ function drawStalkerGlow() {
     return;
   }
 
-  const glow = ctx.createRadialGradient(stalker.x, stalker.y, 0, stalker.x, stalker.y, 40);
-  glow.addColorStop(0, "rgba(255, 229, 173, 0.33)");
-  glow.addColorStop(0.32, "rgba(255, 153, 72, 0.16)");
+  const glow = ctx.createRadialGradient(stalker.x, stalker.y, 0, stalker.x, stalker.y, 32);
+  glow.addColorStop(0, "rgba(255, 180, 96, 0.2)");
+  glow.addColorStop(0.32, "rgba(255, 132, 48, 0.1)");
   glow.addColorStop(1, "rgba(0, 0, 0, 0)");
 
   ctx.save();
   ctx.globalCompositeOperation = "screen";
   ctx.fillStyle = glow;
   ctx.beginPath();
-  ctx.arc(stalker.x, stalker.y, 40, 0, Math.PI * 2);
+  ctx.arc(stalker.x, stalker.y, 32, 0, Math.PI * 2);
   ctx.fill();
   ctx.restore();
 }
