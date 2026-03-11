@@ -2,19 +2,21 @@ const canvas = document.getElementById("scene");
 const ctx = canvas.getContext("2d", { alpha: true });
 
 const BASE_CONFIG = {
-  followLerp: 0.2,
-  spawnDistance: 18,
-  lifeMs: 4300,
-  fadeStartMs: 2300,
-  maxClusters: 120,
-  trailAlpha: 0.22,
+  followLerp: 0.085,
+  spawnDistance: 46,
+  spawnCooldownMs: 120,
+  lifeMs: 5200,
+  fadeStartMs: 2900,
+  maxClusters: 80,
+  trailAlpha: 0.16,
 };
 
 const REDUCED_CONFIG = {
-  followLerp: 0.28,
-  spawnDistance: 34,
-  maxClusters: 60,
-  trailAlpha: 0.34,
+  followLerp: 0.14,
+  spawnDistance: 70,
+  spawnCooldownMs: 220,
+  maxClusters: 40,
+  trailAlpha: 0.28,
 };
 
 const PALETTE = [
@@ -42,6 +44,7 @@ const state = {
   clusters: [],
   lastSpawnX: pointer.x,
   lastSpawnY: pointer.y,
+  lastSpawnAt: 0,
   lastFrameTime: performance.now(),
   hazeCanvas: document.createElement("canvas"),
 };
@@ -78,9 +81,9 @@ function buildHazeLayer() {
   hctx.clearRect(0, 0, w, h);
 
   const fields = [
-    { x: w * 0.38, y: h * 0.28, radius: Math.max(w, h) * 0.68, hue: 24, sat: 84, light: 36, alpha: 0.28 },
-    { x: w * 0.74, y: h * 0.42, radius: Math.max(w, h) * 0.58, hue: 16, sat: 79, light: 34, alpha: 0.24 },
-    { x: w * 0.26, y: h * 0.78, radius: Math.max(w, h) * 0.52, hue: 31, sat: 70, light: 31, alpha: 0.2 },
+    { x: w * 0.38, y: h * 0.28, radius: Math.max(w, h) * 0.68, hue: 24, sat: 84, light: 29, alpha: 0.2 },
+    { x: w * 0.74, y: h * 0.42, radius: Math.max(w, h) * 0.58, hue: 16, sat: 79, light: 27, alpha: 0.16 },
+    { x: w * 0.26, y: h * 0.78, radius: Math.max(w, h) * 0.52, hue: 31, sat: 70, light: 24, alpha: 0.14 },
   ];
 
   for (const field of fields) {
@@ -183,15 +186,15 @@ function createClusterSprite(coreRadius, petals, coreColor) {
 function createCluster(x, y) {
   const petals = [];
   const petalCount = Math.floor(random(5, 10));
-  const coreRadius = random(8, 15);
+  const coreRadius = random(14, 30);
 
   for (let i = 0; i < petalCount; i += 1) {
     const step = (Math.PI * 2 * i) / petalCount;
     petals.push({
       angle: step + random(-0.24, 0.24),
-      distance: random(coreRadius * 0.45, coreRadius * 1.15),
-      rx: random(5, 16),
-      ry: random(3, 11),
+      distance: random(coreRadius * 0.45, coreRadius * 1.35),
+      rx: random(10, 30),
+      ry: random(7, 20),
       tilt: random(-0.72, 0.72),
       color: pickColor(),
     });
@@ -218,24 +221,30 @@ function createCluster(x, y) {
     seed: Math.random() * 999,
     depthDirX: toVanishX / toVanishLength,
     depthDirY: toVanishY / toVanishLength,
-    depthTravel: random(24, 92),
+    depthTravel: random(56, 180),
     sprite,
     spriteSize: sprite.width,
     depth: 0,
   };
 }
 
-function spawnAtStalker() {
+function spawnAtStalker(force = false) {
   const cfg = runtimeConfig();
+  const now = performance.now();
   const distance = Math.hypot(stalker.x - state.lastSpawnX, stalker.y - state.lastSpawnY);
 
-  if (distance < cfg.spawnDistance) {
+  if (!force && distance < cfg.spawnDistance) {
+    return;
+  }
+
+  if (!force && now - state.lastSpawnAt < cfg.spawnCooldownMs) {
     return;
   }
 
   state.clusters.push(createCluster(stalker.x, stalker.y));
   state.lastSpawnX = stalker.x;
   state.lastSpawnY = stalker.y;
+  state.lastSpawnAt = now;
 
   if (state.clusters.length > cfg.maxClusters) {
     state.clusters.splice(0, state.clusters.length - cfg.maxClusters);
@@ -264,9 +273,9 @@ function drawHaze(now) {
 
   ctx.save();
   ctx.globalCompositeOperation = "screen";
-  ctx.globalAlpha = 0.34;
+  ctx.globalAlpha = 0.24;
   ctx.drawImage(state.hazeCanvas, driftX - 12, driftY - 10);
-  ctx.globalAlpha = 0.2;
+  ctx.globalAlpha = 0.14;
   ctx.drawImage(state.hazeCanvas, -driftX * 0.42, -driftY * 0.34);
   ctx.restore();
 }
@@ -276,9 +285,10 @@ function drawCluster(cluster) {
   const fadeProgress = fadeWindow <= 0 ? 1 : clamp((cluster.age - cluster.fadeStart) / fadeWindow, 0, 1);
   const phase = cluster.depth;
   const depthEase = phase * phase;
-  const alpha = clamp((1 - fadeProgress) * (0.85 - depthEase * 0.36), 0, 1);
+  const emergence = clamp(phase / 0.14, 0, 1);
+  const alpha = clamp((1 - fadeProgress) * (0.72 - depthEase * 0.3) * emergence, 0, 1);
 
-  const depthScale = 0.62 + depthEase * 1.46;
+  const depthScale = 0.74 + depthEase * 1.9;
   const wanderRadius = 2 + depthEase * 12;
   const depthOffset = depthEase * cluster.depthTravel;
   const originX =
@@ -298,14 +308,14 @@ function drawCluster(cluster) {
   ctx.globalAlpha = alpha;
 
   if ("filter" in ctx) {
-    const focusPivot = 0.34;
+    const focusPivot = 0.26;
     const blur =
       phase <= focusPivot
-        ? lerp(3.6, 0.7, phase / focusPivot)
-        : lerp(0.7, 5.8, (phase - focusPivot) / (1 - focusPivot));
-    const focusGain = Math.exp(-Math.pow((phase - 0.34) / 0.2, 2));
-    const saturation = clamp(0.34 + focusGain * 0.58 - phase * 0.32, 0.14, 0.9);
-    const brightness = clamp(0.32 + focusGain * 0.4 - phase * 0.28, 0.12, 0.85);
+        ? lerp(5, 1.1, phase / focusPivot)
+        : lerp(1.1, 8.2, (phase - focusPivot) / (1 - focusPivot));
+    const focusGain = Math.exp(-Math.pow((phase - 0.3) / 0.13, 2));
+    const saturation = clamp(0.36 + focusGain * 0.64 - phase * 0.34, 0.12, 0.95);
+    const brightness = clamp(0.26 + focusGain * 0.42 - phase * 0.22, 0.1, 0.82);
     ctx.filter = `blur(${blur}px) saturate(${saturation}) brightness(${brightness})`;
   }
 
@@ -324,16 +334,16 @@ function drawStalkerGlow() {
     return;
   }
 
-  const glow = ctx.createRadialGradient(stalker.x, stalker.y, 0, stalker.x, stalker.y, 32);
-  glow.addColorStop(0, "rgba(255, 180, 96, 0.2)");
-  glow.addColorStop(0.32, "rgba(255, 132, 48, 0.1)");
+  const glow = ctx.createRadialGradient(stalker.x, stalker.y, 0, stalker.x, stalker.y, 24);
+  glow.addColorStop(0, "rgba(255, 180, 96, 0.08)");
+  glow.addColorStop(0.32, "rgba(255, 132, 48, 0.04)");
   glow.addColorStop(1, "rgba(0, 0, 0, 0)");
 
   ctx.save();
   ctx.globalCompositeOperation = "screen";
   ctx.fillStyle = glow;
   ctx.beginPath();
-  ctx.arc(stalker.x, stalker.y, 32, 0, Math.PI * 2);
+  ctx.arc(stalker.x, stalker.y, 24, 0, Math.PI * 2);
   ctx.fill();
   ctx.restore();
 }
@@ -383,7 +393,7 @@ function engagePointer(clientX, clientY) {
 canvas.addEventListener("pointerdown", (event) => {
   pointer.engaged = true;
   engagePointer(event.clientX, event.clientY);
-  state.clusters.push(createCluster(event.clientX, event.clientY));
+  spawnAtStalker(true);
 });
 
 canvas.addEventListener("pointermove", (event) => {
