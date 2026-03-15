@@ -80,6 +80,6 @@ projects/<project-name>/
 | --- | --- | --- | --- | --- |
 | mouse-stalker | 黒い奥行き空間で花弁状の色彩が滲みながら沈むマウスストーカー習作 | Canvas 2D, Vanilla JS, Vite, SCSS | `projects/mouse-stalker` | done |
 | mobile-kinetic-study | モビルアート・キネティックアートの揺動表現を検証する習作 | Canvas 2D, Vanilla JS | `projects/mobile-kinetic-study` | in-progress |
-| elastic-2d-balls | 白黒二値で敷き詰め円の弾性と力学連鎖を可視化する習作 | Canvas 2D, Vanilla JS | `projects/elastic-2d-balls` | in-progress |
+| elastic-2d-balls | 白黒二値で敷き詰め円の弾性と力学連鎖を可視化する習作 | Canvas 2D, Vanilla JS, Vite, SCSS | `projects/elastic-2d-balls` | done |
 | fourier-transform-visualizer | 時間領域・周波数領域・エピサイクルでフーリエ分解を同時可視化する習作 | Canvas 2D, Vanilla JS | `projects/fourier-transform-visualizer` | in-progress |
 | paulsmithy-tailored-stripes | ビビッドな多色ストライプを大人っぽい質感で揺らすインタラクション習作 | Canvas 2D, Vanilla JS | `projects/paulsmithy-tailored-stripes` | in-progress |
