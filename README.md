@@ -67,14 +67,19 @@ projects/<project-name>/
 
 ## プロジェクトインデックス運用ルール（必須）
 
-新しいサブプロジェクトを作成したら、**この README の「Project Index」に必ず追記する**。
+新しいサブプロジェクトを作成したら、**この README の「Project Index」とルートの `index.html` に必ず追記する**。
 
 - 追記タイミング: サブプロジェクト作成時（同一コミット推奨）
-- 記載項目: `Name` / `Summary` / `Tech` / `Path` / `Status`
-- 既存行の更新: 方針変更・完了・保留時に都度更新
+- 記載項目（README）: `Name` / `Summary` / `Tech` / `Path` / `Status`
+- 記載項目（index.html）: `プロジェクト名` / `進捗` / `リンク` / `最終更新日` / `概要`
+- 既存行の更新: 方針変更・完了・保留など、**進捗が発生するたびに `index.html` を更新する**
 
 ## Project Index
 
 | Name | Summary | Tech | Path | Status |
 | --- | --- | --- | --- | --- |
 | mouse-stalker | 黒い奥行き空間で花弁状の色彩が滲みながら沈むマウスストーカー習作 | Canvas 2D, Vanilla JS, Vite, SCSS | `projects/mouse-stalker` | done |
+| mobile-kinetic-study | モビルアート・キネティックアートの揺動表現を検証する習作 | Canvas 2D, Vanilla JS | `projects/mobile-kinetic-study` | in-progress |
+| elastic-2d-balls | 白黒二値で敷き詰め円の弾性と力学連鎖を可視化する習作 | Canvas 2D, Vanilla JS | `projects/elastic-2d-balls` | in-progress |
+| fourier-transform-visualizer | 時間領域・周波数領域・エピサイクルでフーリエ分解を同時可視化する習作 | Canvas 2D, Vanilla JS | `projects/fourier-transform-visualizer` | in-progress |
+| paulsmithy-tailored-stripes | ビビッドな多色ストライプを大人っぽい質感で揺らすインタラクション習作 | Canvas 2D, Vanilla JS | `projects/paulsmithy-tailored-stripes` | in-progress |

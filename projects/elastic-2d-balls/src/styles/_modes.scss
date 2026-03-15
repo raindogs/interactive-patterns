@@ -1,0 +1,34 @@
+body[data-mode="normal"] {
+  color: #000;
+}
+
+body[data-mode="normal"] .hud {
+  color: #fff;
+  background: rgba(0, 0, 0, 0.62);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  text-shadow: none;
+}
+
+body[data-mode="gradation"] {
+  color: #000;
+}
+
+body[data-mode="fine"] {
+  color: #000;
+}
+
+body[data-mode="fine"] .hud {
+  color: #fff;
+  background: #000;
+  text-shadow: none;
+}
+
+body[data-mode="mask"] {
+  color: #fff;
+}
+
+body[data-mode="mask"] .hud {
+  color: #fff;
+  text-shadow: 0 0 1px rgba(255, 255, 255, 0.15);
+}

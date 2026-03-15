@@ -1,0 +1,32 @@
+#scene {
+  position: fixed;
+  inset: 0;
+  display: block;
+  width: 100vw;
+  height: 100vh;
+  background: #fff;
+  z-index: 0;
+}
+
+body[data-mode="normal"],
+body[data-mode="gradation"],
+body[data-mode="fine"] {
+  background: #fff;
+}
+
+body[data-mode="normal"] #scene,
+body[data-mode="fine"] #scene {
+  background: #fff;
+}
+
+body[data-mode="mask"] {
+  background-color: #000;
+  background-image: var(--mask-background-image);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+body[data-mode="mask"] #scene {
+  background: transparent;
+}

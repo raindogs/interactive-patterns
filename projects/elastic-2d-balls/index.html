@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Elastic 2D Balls</title>
+    <link rel="icon" href="data:," />
+  </head>
+  <body>
+    <canvas id="scene" aria-label="Elastic circle field"></canvas>
+    <aside class="hud" aria-live="polite">
+      <h1>Elastic 2D Balls</h1>
+      <p>Forces ripple through a packed field of circles.</p>
+      <nav class="hud-menu" aria-label="Mode menu">
+        <a data-mode-link="normal" href="./">Normal</a>
+        <a data-mode-link="gradation" href="?mode=gradation">Gradation</a>
+        <a data-mode-link="fine" href="?mode=fine">Fine</a>
+        <a data-mode-link="mask" href="?mode=mask">Mask</a>
+      </nav>
+      <nav class="hud-submenu" id="mask-texture-menu" aria-label="Mask texture menu" hidden>
+        <span class="hud-submenu-label">Texture</span>
+        <a data-mask-texture="1" href="?mode=mask&texture=1">01</a>
+        <a data-mask-texture="2" href="?mode=mask&texture=2">02</a>
+        <a data-mask-texture="3" href="?mode=mask&texture=3">03</a>
+      </nav>
+      <div class="hud-controls">
+        <label class="hud-toggle" for="hover-boost-toggle">
+          <input id="hover-boost-toggle" type="checkbox" />
+          <span class="hud-toggle-track" aria-hidden="true"></span>
+          <span class="hud-toggle-text">Boost x2</span>
+        </label>
+      </div>
+    </aside>
+    <script type="module">
+      if (import.meta.env && import.meta.env.DEV) {
+        import("./src/main.js");
+      } else {
+        const stylesheet = document.createElement("link");
+        stylesheet.rel = "stylesheet";
+        stylesheet.href = "./styles.css";
+        document.head.appendChild(stylesheet);
+
+        const script = document.createElement("script");
+        script.src = "./main.js";
+        document.body.appendChild(script);
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>interactive-patterns | Project Index</title>
+    <style>
+      :root {
+        --bg: #0b0c10;
+        --panel: #14171e;
+        --text: #f3f6ff;
+        --muted: #a5adc1;
+        --line: #2a3040;
+        --accent: #4dd3ff;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        color: var(--text);
+        background:
+          radial-gradient(circle at 15% 15%, #1d2742 0%, transparent 35%),
+          radial-gradient(circle at 85% 10%, #263351 0%, transparent 40%),
+          linear-gradient(120deg, #07080b 0%, var(--bg) 55%, #10131a 100%);
+        font-family:
+          "Avenir Next",
+          "Segoe UI",
+          "Hiragino Kaku Gothic ProN",
+          "Noto Sans JP",
+          sans-serif;
+      }
+
+      main {
+        width: min(1080px, calc(100vw - 32px));
+        margin: 32px auto 64px;
+      }
+
+      h1 {
+        margin: 0 0 8px;
+        font-size: clamp(1.8rem, 3vw, 2.4rem);
+        letter-spacing: 0.02em;
+      }
+
+      p {
+        margin: 0;
+        color: var(--muted);
+      }
+
+      .panel {
+        margin-top: 20px;
+        padding: 20px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: rgba(20, 23, 30, 0.85);
+        backdrop-filter: blur(4px);
+      }
+
+      .panel h2 {
+        margin: 0 0 10px;
+        font-size: 1.1rem;
+      }
+
+      ul {
+        margin: 0;
+        padding-left: 20px;
+      }
+
+      li {
+        margin: 6px 0;
+      }
+
+      table {
+        width: 100%;
+        margin-top: 20px;
+        border-collapse: collapse;
+        border: 1px solid var(--line);
+        background: rgba(11, 12, 16, 0.8);
+      }
+
+      th,
+      td {
+        padding: 12px 10px;
+        border-bottom: 1px solid var(--line);
+        text-align: left;
+        vertical-align: top;
+      }
+
+      th {
+        font-size: 0.92rem;
+        color: var(--muted);
+        background: rgba(255, 255, 255, 0.03);
+      }
+
+      td {
+        font-size: 0.95rem;
+      }
+
+      tr:last-child td {
+        border-bottom: none;
+      }
+
+      a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+
+      a:hover {
+        text-decoration: underline;
+      }
+
+      .chip {
+        display: inline-block;
+        padding: 3px 8px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        font-size: 0.82rem;
+        color: var(--muted);
+      }
+
+      .status-done {
+        color: #6cf2a7;
+      }
+
+      .status-progress {
+        color: #ffd166;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>interactive-patterns / Project Index</h1>
+        <p>ブラウザインタラクション習作の進捗一覧</p>
+      </header>
+
+      <section class="panel">
+        <h2>更新ルール（必須）</h2>
+        <ul>
+          <li>新しいサブプロジェクトを作成したら、このページの表に必ず1行追加する。</li>
+          <li>サブプロジェクトに進捗が発生したら、同一コミットで当該行を必ず更新する。</li>
+          <li>更新対象は最低限「進捗」「リンク」「最終更新日」「概要」。</li>
+        </ul>
+      </section>
+
+      <table>
+        <thead>
+          <tr>
+            <th>プロジェクト名</th>
+            <th>進捗</th>
+            <th>リンク</th>
+            <th>最終更新日</th>
+            <th>概要</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>mouse-stalker</strong></td>
+            <td><span class="chip status-done">done</span></td>
+            <td>
+              <a href="./projects/mouse-stalker/index.html">Demo</a> /
+              <a href="./projects/mouse-stalker/README.md">README</a>
+            </td>
+            <td>2026-03-11</td>
+            <td>黒い奥行き空間で花弁状の色彩が滲みながら沈むマウスストーカー習作</td>
+          </tr>
+          <tr>
+            <td><strong>mobile-kinetic-study</strong></td>
+            <td><span class="chip status-progress">in-progress</span></td>
+            <td><a href="./projects/mobile-kinetic-study/README.md">README</a></td>
+            <td>2026-03-11</td>
+            <td>モビルアート・キネティックアートの揺動表現を検証する習作</td>
+          </tr>
+          <tr>
+            <td><strong>elastic-2d-balls</strong></td>
+            <td><span class="chip status-progress">in-progress</span></td>
+            <td>
+              <a href="./projects/elastic-2d-balls/index.html">Demo</a> /
+              <a href="./projects/elastic-2d-balls/README.md">README</a>
+            </td>
+            <td>2026-03-12</td>
+            <td>白黒二値で敷き詰め円の弾性と力学連鎖を可視化する習作</td>
+          </tr>
+          <tr>
+            <td><strong>fourier-transform-visualizer</strong></td>
+            <td><span class="chip status-progress">in-progress</span></td>
+            <td>
+              <a href="./projects/fourier-transform-visualizer/index.html">Demo</a> /
+              <a href="./projects/fourier-transform-visualizer/README.md">README</a>
+            </td>
+            <td>2026-03-11</td>
+            <td>時間領域・周波数領域・エピサイクルでフーリエ分解を同時可視化する習作</td>
+          </tr>
+          <tr>
+            <td><strong>paulsmithy-tailored-stripes</strong></td>
+            <td><span class="chip status-progress">in-progress</span></td>
+            <td>
+              <a href="./projects/paulsmithy-tailored-stripes/index.html">Demo</a> /
+              <a href="./projects/paulsmithy-tailored-stripes/README.md">README</a>
+            </td>
+            <td>2026-03-11</td>
+            <td>ビビッドな多色ストライプを大人っぽい質感で揺らすインタラクション習作</td>
+          </tr>
+        </tbody>
+      </table>
+    </main>
+  </body>
+</html>
