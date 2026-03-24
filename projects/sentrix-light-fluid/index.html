@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sentrix Light Fluid Study</title>
+    <link rel="icon" href="data:," />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Michroma&family=Zen+Kaku+Gothic+New:wght@400;500&display=swap"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div id="front-anim" class="app-shell">
+      <div class="scene" aria-hidden="true">
+        <div class="scene__backdrop"></div>
+        <div class="scene__beams">
+          <span class="scene__beam scene__beam--1"></span>
+          <span class="scene__beam scene__beam--2"></span>
+          <span class="scene__beam scene__beam--3"></span>
+          <span class="scene__beam scene__beam--4"></span>
+          <span class="scene__beam scene__beam--5"></span>
+        </div>
+        <canvas id="p-front-bg-anim"></canvas>
+        <div class="scene__grain"></div>
+        <div class="scene__veil"></div>
+      </div>
+
+      <header class="toolbar">
+        <button
+          id="dark-mode-toggle"
+          class="dark-mode-toggle"
+          type="button"
+          aria-label="Toggle light and dark theme"
+        >
+          <span class="dark-mode-toggle__caption">Theme</span>
+          <span class="is-dark-mode-text">LIGHT</span>
+        </button>
+      </header>
+
+      <main class="hero">
+        <p class="hero__eyebrow">Reference Study / SENTRIX</p>
+        <h1>
+          LIGHT BEAMS
+          <span>MEET FLUID</span>
+          INTERACTION
+        </h1>
+        <p class="hero__body">
+          SENTRIX の fixed canvas と同じ流体設定を、ライト/ダーク切り替えつきで検証する習作。
+        </p>
+        <div class="hero__chips">
+          <span>Desktop Hover</span>
+          <span>Fixed Canvas + Parent Tracking</span>
+          <span id="motion-state">Fluid enabled</span>
+        </div>
+      </main>
+    </div>
+    <script src="main.js"></script>
+  </body>
+</html>

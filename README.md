@@ -83,3 +83,4 @@ projects/<project-name>/
 | elastic-2d-balls | 白黒二値で敷き詰め円の弾性と力学連鎖を可視化する習作 | Canvas 2D, Vanilla JS, Vite, SCSS | `projects/elastic-2d-balls` | done |
 | fourier-transform-visualizer | 時間領域・周波数領域・エピサイクルでフーリエ分解を同時可視化する習作 | Canvas 2D, Vanilla JS | `projects/fourier-transform-visualizer` | in-progress |
 | paulsmithy-tailored-stripes | ビビッドな多色ストライプを大人っぽい質感で揺らすインタラクション習作 | Canvas 2D, Vanilla JS | `projects/paulsmithy-tailored-stripes` | in-progress |
+| sentrix-light-fluid | SENTRIX の静止ライトビーム背景と淡い流体系 hover を抽出した習作 | WebGL, Vanilla JS, Vite, SCSS, webgl-fluid | `projects/sentrix-light-fluid` | done |
