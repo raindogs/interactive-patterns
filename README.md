@@ -84,3 +84,16 @@ projects/<project-name>/
 | fourier-transform-visualizer | 時間領域・周波数領域・エピサイクルでフーリエ分解を同時可視化する習作 | Canvas 2D, Vanilla JS | `projects/fourier-transform-visualizer` | in-progress |
 | paulsmithy-tailored-stripes | ビビッドな多色ストライプを大人っぽい質感で揺らすインタラクション習作 | Canvas 2D, Vanilla JS | `projects/paulsmithy-tailored-stripes` | in-progress |
 | sentrix-light-fluid | SENTRIX の静止ライトビーム背景と淡い流体系 hover を抽出した習作 | WebGL, Vanilla JS, Vite, SCSS, webgl-fluid | `projects/sentrix-light-fluid` | done |
+
+## LU.TWIYO基準色
+
+`/Users/kondo/Desktop/logo_LU.svg` から観測した配色を、LU.TWIYO 系の参照色として保持する。
+
+| Name | Hex | Notes |
+| --- | --- | --- |
+| LU Yellow | `#FAC800` | ロゴの黄 |
+| LU Blue | `#003287` | ロゴの青 |
+| LU Orange | `#F06400` | ロゴの橙 |
+| LU Red | `#E60014` | ロゴの赤 |
+| LU Deep Red | `#BE0000` | ロゴの濃赤 |
+| LU Green | `#2DA037` | ロゴの緑 |

@@ -11,7 +11,7 @@
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Michroma&family=Zen+Kaku+Gothic+New:wght@400;500&display=swap"
     />
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="styles.css?v=20260324-hud-5" />
   </head>
   <body>
     <div id="front-anim" class="app-shell">
@@ -29,35 +29,95 @@
         <div class="scene__veil"></div>
       </div>
 
-      <header class="toolbar">
-        <button
-          id="dark-mode-toggle"
-          class="dark-mode-toggle"
-          type="button"
-          aria-label="Toggle light and dark theme"
-        >
-          <span class="dark-mode-toggle__caption">Theme</span>
-          <span class="is-dark-mode-text">LIGHT</span>
-        </button>
-      </header>
+      <aside class="hud" aria-label="Fluid control HUD">
+        <section class="hud__panel hud__panel--intro">
+          <p class="hud__eyebrow">Fluid Control HUD</p>
+          <div class="hud__status">
+            <span class="hud__status-label">Status</span>
+            <span id="motion-state" class="hud__status-value">Fluid enabled</span>
+          </div>
+        </section>
 
-      <main class="hero">
-        <p class="hero__eyebrow">Reference Study / SENTRIX</p>
-        <h1>
-          LIGHT BEAMS
-          <span>MEET FLUID</span>
-          INTERACTION
-        </h1>
-        <p class="hero__body">
-          SENTRIX の fixed canvas と同じ流体設定を、ライト/ダーク切り替えつきで検証する習作。
-        </p>
-        <div class="hero__chips">
-          <span>Desktop Hover</span>
-          <span>Fixed Canvas + Parent Tracking</span>
-          <span id="motion-state">Fluid enabled</span>
-        </div>
-      </main>
+        <section class="hud__panel">
+          <div class="hud__row">
+            <span class="hud__label">Theme</span>
+          </div>
+          <div class="hud__segmented" data-control-group="theme">
+            <button type="button" data-action="theme" data-value="light">Light</button>
+            <button type="button" data-action="theme" data-value="dark">Dark</button>
+          </div>
+        </section>
+
+        <section class="hud__panel">
+          <div class="hud__row">
+            <span class="hud__label">Color</span>
+            <span class="hud__hint">LU.TWIYO</span>
+          </div>
+          <div class="hud__segmented" data-control-group="colorMode">
+            <button type="button" data-action="colorMode" data-value="white">White</button>
+            <button type="button" data-action="colorMode" data-value="colorful">Colorful</button>
+          </div>
+          <div class="hud__swatches" aria-hidden="true">
+            <span style="--swatch: #fac800"></span>
+            <span style="--swatch: #003287"></span>
+            <span style="--swatch: #f06400"></span>
+            <span style="--swatch: #e60014"></span>
+            <span style="--swatch: #be0000"></span>
+            <span style="--swatch: #2da037"></span>
+          </div>
+        </section>
+
+        <section class="hud__controls" aria-label="Fluid parameters">
+          <article class="hud__panel hud__panel--control">
+            <div class="hud__row">
+              <span class="hud__label">Radius</span>
+              <span id="value-radius" class="hud__value">0.20</span>
+            </div>
+            <div class="hud__segmented hud__segmented--compact" data-control-group="radius">
+              <button type="button" data-action="radius" data-value="low">Low</button>
+              <button type="button" data-action="radius" data-value="mid">Mid</button>
+              <button type="button" data-action="radius" data-value="high">High</button>
+            </div>
+          </article>
+
+          <article class="hud__panel hud__panel--control">
+            <div class="hud__row">
+              <span class="hud__label">Force</span>
+              <span id="value-force" class="hud__value">6000</span>
+            </div>
+            <div class="hud__segmented hud__segmented--compact" data-control-group="force">
+              <button type="button" data-action="force" data-value="low">Low</button>
+              <button type="button" data-action="force" data-value="mid">Mid</button>
+              <button type="button" data-action="force" data-value="high">High</button>
+            </div>
+          </article>
+
+          <article class="hud__panel hud__panel--control">
+            <div class="hud__row">
+              <span class="hud__label">Density</span>
+              <span id="value-density" class="hud__value">4.5</span>
+            </div>
+            <div class="hud__segmented hud__segmented--compact" data-control-group="density">
+              <button type="button" data-action="density" data-value="low">Low</button>
+              <button type="button" data-action="density" data-value="mid">Mid</button>
+              <button type="button" data-action="density" data-value="high">High</button>
+            </div>
+          </article>
+
+          <article class="hud__panel hud__panel--control">
+            <div class="hud__row">
+              <span class="hud__label">Curl</span>
+              <span id="value-curl" class="hud__value">3.0</span>
+            </div>
+            <div class="hud__segmented hud__segmented--compact" data-control-group="curl">
+              <button type="button" data-action="curl" data-value="low">Low</button>
+              <button type="button" data-action="curl" data-value="mid">Mid</button>
+              <button type="button" data-action="curl" data-value="high">High</button>
+            </div>
+          </article>
+        </section>
+      </aside>
     </div>
-    <script src="main.js"></script>
+    <script src="main.js?v=20260324-hud-5"></script>
   </body>
 </html>

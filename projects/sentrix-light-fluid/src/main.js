@@ -4,6 +4,18 @@ import WebGLFluid from "./vendor/webgl-fluid-sentrix.mjs";
 const DESKTOP_MEDIA = "(min-width: 768px)";
 const REDUCED_MOTION_MEDIA = "(prefers-reduced-motion: reduce)";
 const THEME_STORAGE_KEY = "sentrix-study-theme";
+const WHITE_FLUID_COLORS = {
+  light: { r: 0.18, g: 0.22, b: 0.28 },
+  dark: { r: 0.22, g: 0.24, b: 0.25 },
+};
+const LU_TWIYO_COLORS = [
+  { name: "LU Yellow", hex: "#FAC800" },
+  { name: "LU Blue", hex: "#003287" },
+  { name: "LU Orange", hex: "#F06400" },
+  { name: "LU Red", hex: "#E60014" },
+  { name: "LU Deep Red", hex: "#BE0000" },
+  { name: "LU Green", hex: "#2DA037" },
+];
 
 const FLUID_OPTIONS = {
   TRIGGER: "hover",
@@ -20,7 +32,7 @@ const FLUID_OPTIONS = {
   SPLAT_RADIUS: 0.2,
   SPLAT_FORCE: 6000,
   SHADING: false,
-  COLORFUL: true,
+  COLORFUL: false,
   COLOR_UPDATE_SPEED: 10,
   PAUSED: false,
   BACK_COLOR: { r: 0, g: 0, b: 0 },
@@ -38,13 +50,68 @@ const FLUID_OPTIONS = {
   START_DELAY: 500,
   IDLE_TIMEOUT: 1000,
   INITIAL_IDLE_TIMEOUT: 600,
-  STATIC_COLOR: { r: 0.086, g: 0.0916, b: 0.092 },
+  STATIC_COLOR: WHITE_FLUID_COLORS.dark,
+};
+
+const PARAMETER_PRESETS = {
+  radius: {
+    option: "SPLAT_RADIUS",
+    levels: { low: 0.12, mid: 0.2, high: 0.32 },
+    format: (value) => value.toFixed(2),
+  },
+  force: {
+    option: "SPLAT_FORCE",
+    levels: { low: 3500, mid: 6000, high: 9000 },
+    format: (value) => String(value),
+  },
+  density: {
+    option: "DENSITY_DISSIPATION",
+    levels: { low: 2.5, mid: 4.5, high: 7.5 },
+    format: (value) => value.toFixed(1),
+  },
+  curl: {
+    option: "CURL",
+    levels: { low: 1.5, mid: 3, high: 6 },
+    format: (value) => value.toFixed(1),
+  },
+};
+
+const DEFAULT_CONTROL_STATE = {
+  theme: "dark",
+  colorMode: "white",
+  radius: "mid",
+  force: "mid",
+  density: "mid",
+  curl: "mid",
 };
 
 function updateMotionState(label, message) {
   if (label) {
     label.textContent = message;
   }
+}
+
+function hexToUnitRgb(hex) {
+  const normalized = hex.replace("#", "");
+  const value = normalized.length === 3
+    ? normalized.split("").map((char) => char + char).join("")
+    : normalized;
+
+  const number = Number.parseInt(value, 16);
+
+  return {
+    r: ((number >> 16) & 255) / 255,
+    g: ((number >> 8) & 255) / 255,
+    b: (number & 255) / 255,
+  };
+}
+
+function scaleColor(color, intensity) {
+  return {
+    r: color.r * intensity,
+    g: color.g * intensity,
+    b: color.b * intensity,
+  };
 }
 
 function resolveTheme() {
@@ -54,48 +121,116 @@ function resolveTheme() {
     return storedTheme;
   }
 
-  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  return "dark";
 }
 
 function applyTheme(mode) {
   const nextMode = mode === "dark" ? "dark" : "light";
-  const toggles = Array.from(document.querySelectorAll(".dark-mode-toggle"));
-  const labels = Array.from(document.querySelectorAll(".is-dark-mode-text"));
-
   document.documentElement.setAttribute("data-theme-mode", nextMode);
   window.localStorage.setItem(THEME_STORAGE_KEY, nextMode);
+}
 
-  toggles.forEach((toggle) => {
-    toggle.classList.toggle("is-toggle--active", nextMode === "dark");
-    toggle.setAttribute("aria-pressed", String(nextMode === "dark"));
+function buildColorModePatch(colorMode) {
+  if (colorMode === "colorful") {
+    return {
+      COLORFUL: true,
+      STATIC_COLOR: null,
+      COLOR_PALETTE: LU_TWIYO_COLORS.map((entry) => scaleColor(hexToUnitRgb(entry.hex), 0.42)),
+    };
+  }
+
+  return {
+    COLORFUL: false,
+    STATIC_COLOR: WHITE_FLUID_COLORS.dark,
+    COLOR_PALETTE: null,
+  };
+}
+
+function buildFluidPatch(state) {
+  const patch = buildColorModePatch(state.colorMode);
+
+  if (state.colorMode === "white") {
+    patch.STATIC_COLOR = WHITE_FLUID_COLORS[state.theme];
+  }
+
+  Object.entries(PARAMETER_PRESETS).forEach(([key, config]) => {
+    patch[config.option] = config.levels[state[key]];
   });
 
-  labels.forEach((label) => {
-    label.classList.toggle("is-toggle--active", nextMode === "dark");
-    label.textContent = nextMode === "dark" ? "DARK" : "LIGHT";
+  return patch;
+}
+
+function syncHudState(state) {
+  applyTheme(state.theme);
+  document.documentElement.dataset.fluidColorMode = state.colorMode;
+
+  document.querySelectorAll("[data-control-group]").forEach((group) => {
+    const key = group.getAttribute("data-control-group");
+    const selectedValue = state[key];
+
+    group.querySelectorAll("button[data-value]").forEach((button) => {
+      const isActive = button.getAttribute("data-value") === selectedValue;
+      button.classList.toggle("is-active", isActive);
+      button.setAttribute("aria-pressed", String(isActive));
+    });
+  });
+
+  Object.entries(PARAMETER_PRESETS).forEach(([key, config]) => {
+    const label = document.getElementById(`value-${key}`);
+    const level = state[key];
+
+    if (label) {
+      label.textContent = config.format(config.levels[level]);
+    }
   });
 }
 
-function initializeThemeToggle() {
-  const toggles = Array.from(document.querySelectorAll(".dark-mode-toggle"));
-  const initialTheme = resolveTheme();
+function attachHudInteractions(state, controller) {
+  const hud = document.querySelector(".hud");
 
-  applyTheme(initialTheme);
+  if (!(hud instanceof HTMLElement)) {
+    return;
+  }
 
-  toggles.forEach((toggle) => {
-    toggle.addEventListener("click", () => {
-      const currentTheme = document.documentElement.getAttribute("data-theme-mode");
-      applyTheme(currentTheme === "dark" ? "light" : "dark");
+  ["mousemove", "mousedown", "touchstart", "touchmove"].forEach((eventName) => {
+    hud.addEventListener(eventName, (event) => {
+      event.stopPropagation();
     });
+  });
+
+  hud.addEventListener("click", (event) => {
+    const button = event.target.closest("button[data-action]");
+
+    if (!(button instanceof HTMLButtonElement)) {
+      return;
+    }
+
+    const action = button.getAttribute("data-action");
+    const value = button.getAttribute("data-value");
+
+    if (!action || !value || !Object.hasOwn(state, action)) {
+      return;
+    }
+
+    state[action] = value;
+    syncHudState(state);
+
+    if (controller) {
+      controller.setOptions(buildFluidPatch(state));
+    }
   });
 }
 
 function bootstrap() {
-  initializeThemeToggle();
-
   const canvas = document.getElementById("p-front-bg-anim");
   const interactionSurface = document.getElementById("front-anim");
   const motionState = document.getElementById("motion-state");
+  const state = {
+    ...DEFAULT_CONTROL_STATE,
+    theme: resolveTheme(),
+  };
+
+  syncHudState(state);
 
   if (!(canvas instanceof HTMLCanvasElement) || !(interactionSurface instanceof HTMLElement)) {
     return;
@@ -108,6 +243,7 @@ function bootstrap() {
   document.documentElement.classList.toggle("is-fluid-disabled", !enableFluid);
 
   if (!enableFluid) {
+    attachHudInteractions(state, null);
     updateMotionState(
       motionState,
       reducedMotionQuery.matches ? "Reduced motion fallback" : "Desktop only fallback",
@@ -119,14 +255,19 @@ function bootstrap() {
   canvas.height = window.innerHeight;
 
   try {
-    WebGLFluid(canvas, {
+    const controller = WebGLFluid(canvas, {
       ...FLUID_OPTIONS,
+      ...buildFluidPatch(state),
       EVENT_TARGET: interactionSurface,
     });
+    window.__sentrixFluidController = controller;
+
+    attachHudInteractions(state, controller ?? null);
     updateMotionState(motionState, "Fluid enabled");
   } catch (error) {
     console.error("Failed to initialize fluid study", error);
     document.documentElement.classList.add("is-fluid-disabled");
+    attachHudInteractions(state, null);
     updateMotionState(motionState, "WebGL fallback");
   }
 }

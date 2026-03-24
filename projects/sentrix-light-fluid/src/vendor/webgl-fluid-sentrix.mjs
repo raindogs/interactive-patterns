@@ -1001,6 +1001,7 @@ function ft(V, _) {
     IDLE_TIMEOUT: 1e3,
     INITIAL_IDLE_TIMEOUT: 600,
     STATIC_COLOR: null,
+    COLOR_PALETTE: null,
     ..._
   };
   function he() {
@@ -1586,6 +1587,22 @@ function ft(V, _) {
     const o = [];
     _.SHADING && o.push("SHADING"), _.BLOOM && o.push("BLOOM"), _.SUNRAYS && o.push("SUNRAYS"), j.setKeywords(o);
   }
+  function gt(o = {}) {
+    const s = {
+      SHADING: _.SHADING,
+      BLOOM: _.BLOOM,
+      SUNRAYS: _.SUNRAYS,
+      SIM_RESOLUTION: _.SIM_RESOLUTION,
+      DYE_RESOLUTION: _.DYE_RESOLUTION,
+      CAPTURE_RESOLUTION: _.CAPTURE_RESOLUTION
+    };
+    Object.assign(_, o);
+    const a = s.SHADING !== _.SHADING || s.BLOOM !== _.BLOOM || s.SUNRAYS !== _.SUNRAYS;
+    const f = s.SIM_RESOLUTION !== _.SIM_RESOLUTION || s.DYE_RESOLUTION !== _.DYE_RESOLUTION || s.CAPTURE_RESOLUTION !== _.CAPTURE_RESOLUTION;
+    a && t(), f && C(), ("STATIC_COLOR" in o || "COLOR_PALETTE" in o || "COLORFUL" in o) && U.forEach((p) => {
+      p.color = tt();
+    }), _.ON_DEMAND && (startRenderLoop(), scheduleIdleStop());
+  }
   t(), C(), _.IMMEDIATE && je(_.SPLAT_COUNT);
   function i() {
     _.AUTO && _.INTERVAL && !_.PAUSED && (me.push(_.SPLAT_COUNT), _.ON_DEMAND && (startRenderLoop(), scheduleIdleStop())), setTimeout(i, _.INTERVAL);
@@ -1773,6 +1790,14 @@ function ft(V, _) {
         g: _.STATIC_COLOR.g,
         b: _.STATIC_COLOR.b
       };
+    if (_.COLOR_PALETTE && _.COLOR_PALETTE.length > 0) {
+      const o = _.COLOR_PALETTE[Math.floor(Math.random() * _.COLOR_PALETTE.length)];
+      return {
+        r: o.r,
+        g: o.g,
+        b: o.b
+      };
+    }
     const o = st(Math.random(), 1, 1);
     return o.r *= 0.15, o.g *= 0.15, o.b *= 0.15, o;
   }
@@ -1840,6 +1865,15 @@ function ft(V, _) {
       s = (s << 5) - s + o.charCodeAt(a), s |= 0;
     return s;
   }
+  return {
+    getOptions() {
+      return { ..._ };
+    },
+    setOptions: gt,
+    poke() {
+      _.ON_DEMAND && (startRenderLoop(), scheduleIdleStop());
+    }
+  };
 }
 export {
   ft as default

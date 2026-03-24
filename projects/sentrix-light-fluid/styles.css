@@ -14,11 +14,12 @@
   --scene-accent: rgba(232, 239, 240, 0.94);
   --scene-beam: rgba(255, 255, 255, 0.34);
   --surface: rgba(255, 255, 255, 0.72);
+  --surface-strong: rgba(255, 255, 255, 0.88);
   --line: rgba(111, 126, 136, 0.16);
   --text: var(--custom-color-font);
   --muted: rgba(63, 65, 68, 0.72);
-  --chip: rgba(255, 255, 255, 0.72);
   --shadow: rgba(0, 0, 0, 0.12);
+  --shadow-strong: rgba(0, 0, 0, 0.18);
 }
 
 [data-theme-mode=dark] {
@@ -37,11 +38,12 @@
   --scene-accent: rgba(30, 31, 34, 0.98);
   --scene-beam: rgba(248, 252, 252, 0.16);
   --surface: rgba(18, 19, 21, 0.68);
+  --surface-strong: rgba(18, 19, 21, 0.86);
   --line: rgba(243, 246, 246, 0.14);
   --text: var(--custom-color-font);
   --muted: rgba(243, 246, 246, 0.74);
-  --chip: rgba(18, 19, 21, 0.68);
   --shadow: rgba(0, 0, 0, 0.32);
+  --shadow-strong: rgba(0, 0, 0, 0.44);
 }
 
 * {
@@ -149,7 +151,6 @@ body {
   height: 100vh;
   mix-blend-mode: plus-lighter;
   opacity: 1;
-  pointer-events: none;
 }
 
 .scene__grain {
@@ -165,113 +166,162 @@ body {
   mix-blend-mode: screen;
 }
 
-.toolbar {
+.hud {
   position: fixed;
-  top: 24px;
-  right: 24px;
+  left: 24px;
+  bottom: 24px;
   z-index: 4;
-  pointer-events: none;
+  display: grid;
+  gap: 12px;
+  width: min(420px, 100vw - 32px);
 }
 
-.dark-mode-toggle {
+.hud__controls {
   display: grid;
-  grid-auto-flow: column;
-  align-items: center;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
-  padding: 12px 16px;
+}
+
+.hud__panel {
+  display: grid;
+  gap: 12px;
+  padding: 14px 16px;
   border: 1px solid var(--line);
-  border-radius: 999px;
+  border-radius: 18px;
   background: var(--surface);
-  box-shadow: 0 12px 32px var(--shadow);
-  color: var(--text);
+  box-shadow: 0 20px 40px var(--shadow);
+  backdrop-filter: blur(14px);
+}
+
+.hud__panel--intro {
+  gap: 8px;
+  background: var(--surface-strong);
+}
+
+.hud__panel--control {
+  gap: 10px;
+}
+
+.hud__eyebrow,
+.hud__label,
+.hud__hint,
+.hud__value,
+.hud__status-label,
+.hud__status-value,
+.hud__segmented button {
   font-family: "Michroma", sans-serif;
+}
+
+.hud__eyebrow {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.74rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.hud__status,
+.hud__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.hud__status-label,
+.hud__label {
+  color: var(--muted);
+  font-size: 0.64rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.hud__hint {
+  color: var(--muted);
+  font-size: 0.58rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.hud__status-value,
+.hud__value {
+  color: var(--text);
   font-size: 0.72rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  backdrop-filter: blur(12px);
-  pointer-events: auto;
 }
 
-.dark-mode-toggle__caption {
-  color: var(--muted);
-}
-
-.dark-mode-toggle.is-toggle--active {
-  background: var(--chip);
-}
-
-.is-dark-mode-text {
-  min-width: 4.75rem;
-  text-align: center;
-}
-
-.hero {
-  position: relative;
-  z-index: 2;
+.hud__segmented {
   display: grid;
-  min-height: 100vh;
-  place-items: center;
-  padding: 40px 24px;
-  text-align: center;
-  pointer-events: none;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
 }
 
-.hero__eyebrow,
-.hero h1,
-.hero__body,
-.hero__chips {
-  width: min(960px, 100%);
+.hud__segmented--compact {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
-.hero__eyebrow {
-  margin: 0 0 18px;
+.hud__segmented button {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 38px;
+  padding: 10px 12px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18);
   color: var(--muted);
-  font-family: "Michroma", sans-serif;
-  font-size: 0.82rem;
-  letter-spacing: 0.18em;
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
+  transition: background-color 160ms ease, color 160ms ease, border-color 160ms ease, transform 160ms ease;
 }
 
-.hero h1 {
-  margin: 0;
-  font-family: "Michroma", sans-serif;
-  font-size: clamp(2.8rem, 7vw, 6.8rem);
-  font-weight: 400;
-  letter-spacing: 0.04em;
-  line-height: 1.14;
-  text-transform: uppercase;
+[data-theme-mode=dark] .hud__segmented button {
+  background: rgba(255, 255, 255, 0.04);
 }
 
-.hero h1 span {
-  display: inline-block;
+.hud__segmented button:hover {
+  border-color: var(--line);
+  color: var(--text);
+  transform: translateY(-1px);
 }
 
-.hero__body {
-  margin: 22px auto 0;
-  color: var(--muted);
-  font-size: clamp(0.95rem, 1.8vw, 1.1rem);
-  line-height: 1.9;
+.hud__segmented button.is-active {
+  border-color: rgba(255, 255, 255, 0.38);
+  background: rgba(63, 65, 68, 0.92);
+  color: #fff;
 }
 
-.hero__chips {
+[data-theme-mode=dark] .hud__segmented button.is-active {
+  border-color: rgba(243, 246, 246, 0.22);
+  background: rgba(243, 246, 246, 0.14);
+  color: var(--text);
+}
+
+.hud__swatches {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
-  gap: 10px;
-  margin: 28px auto 0;
+  gap: 8px;
+  transition: opacity 160ms ease, filter 160ms ease;
 }
 
-.hero__chips span {
-  padding: 10px 14px;
-  border: 1px solid var(--line);
+.hud__swatches span {
+  width: 18px;
+  height: 18px;
   border-radius: 999px;
-  background: var(--chip);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
-  color: var(--muted);
-  font-family: "Michroma", sans-serif;
-  font-size: 0.68rem;
-  letter-spacing: 0.08em;
-  backdrop-filter: blur(8px);
+  background: var(--swatch);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.32) inset;
+}
+
+[data-fluid-color-mode=white] .hud__swatches {
+  opacity: 0.4;
+  filter: grayscale(1);
+}
+
+[data-fluid-color-mode=colorful] .hud__swatches {
+  opacity: 1;
+  filter: none;
 }
 
 html.is-fluid-disabled #p-front-bg-anim {
@@ -291,20 +341,16 @@ html.is-fluid-disabled #p-front-bg-anim {
     position: absolute;
     min-height: 100vh;
   }
-  .toolbar {
-    top: 16px;
+  .hud {
+    left: 16px;
     right: 16px;
+    bottom: 16px;
+    width: auto;
+  }
+  .hud__controls {
+    grid-template-columns: 1fr;
   }
   .scene__beam {
     width: 22vw;
-  }
-  .hero {
-    padding-block: 88px 72px;
-  }
-  .hero h1 {
-    line-height: 1.22;
-  }
-  .hero__chips {
-    gap: 8px;
   }
 }
