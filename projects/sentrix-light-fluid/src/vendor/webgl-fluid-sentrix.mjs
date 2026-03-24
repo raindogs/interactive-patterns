@@ -1603,7 +1603,9 @@ function ft(V, _) {
       p.color = tt();
     }), _.ON_DEMAND && (startRenderLoop(), scheduleIdleStop());
   }
-  t(), C(), _.IMMEDIATE && je(_.SPLAT_COUNT);
+  t(), C(), U.forEach((o) => {
+    o.color = tt();
+  }), _.IMMEDIATE && je(_.SPLAT_COUNT);
   function i() {
     _.AUTO && _.INTERVAL && !_.PAUSED && (me.push(_.SPLAT_COUNT), _.ON_DEMAND && (startRenderLoop(), scheduleIdleStop())), setTimeout(i, _.INTERVAL);
   }

@@ -11,7 +11,7 @@
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Michroma&family=Zen+Kaku+Gothic+New:wght@400;500&display=swap"
     />
-    <link rel="stylesheet" href="styles.css?v=20260324-hud-5" />
+    <link rel="stylesheet" href="styles.css?v=20260325-hud-single-2" />
   </head>
   <body>
     <div id="front-anim" class="app-shell">
@@ -30,94 +30,97 @@
       </div>
 
       <aside class="hud" aria-label="Fluid control HUD">
-        <section class="hud__panel hud__panel--intro">
-          <p class="hud__eyebrow">Fluid Control HUD</p>
-          <div class="hud__status">
-            <span class="hud__status-label">Status</span>
-            <span id="motion-state" class="hud__status-value">Fluid enabled</span>
+        <section class="hud__panel hud__panel--shell">
+          <div class="hud__head">
+            <p class="hud__title">ash</p>
+            <span id="motion-state" class="visually-hidden">Fluid enabled</span>
           </div>
-        </section>
 
-        <section class="hud__panel">
-          <div class="hud__row">
-            <span class="hud__label">Theme</span>
+          <div class="hud__row hud__row--toggles">
+            <button
+              type="button"
+              class="hud__toggle"
+              data-action="theme"
+              data-control-button="theme"
+              data-state="dark"
+              aria-label="Toggle theme"
+            >
+              <span class="hud__toggle-track" aria-hidden="true"></span>
+              <span class="hud__toggle-value" data-control-value="theme">Dark</span>
+            </button>
+            <button
+              type="button"
+              class="hud__toggle"
+              data-action="colorMode"
+              data-control-button="colorMode"
+              data-state="white"
+              aria-label="Toggle color mode"
+            >
+              <span class="hud__toggle-track" aria-hidden="true"></span>
+              <span class="hud__toggle-value" data-control-value="colorMode">White</span>
+            </button>
+            <div class="hud__swatches" aria-hidden="true">
+              <span style="--swatch: #fac800"></span>
+              <span style="--swatch: #003287"></span>
+              <span style="--swatch: #f06400"></span>
+              <span style="--swatch: #e60014"></span>
+              <span style="--swatch: #be0000"></span>
+              <span style="--swatch: #2da037"></span>
+            </div>
           </div>
-          <div class="hud__segmented" data-control-group="theme">
-            <button type="button" data-action="theme" data-value="light">Light</button>
-            <button type="button" data-action="theme" data-value="dark">Dark</button>
-          </div>
-        </section>
 
-        <section class="hud__panel">
-          <div class="hud__row">
-            <span class="hud__label">Color</span>
-            <span class="hud__hint">LU.TWIYO</span>
-          </div>
-          <div class="hud__segmented" data-control-group="colorMode">
-            <button type="button" data-action="colorMode" data-value="white">White</button>
-            <button type="button" data-action="colorMode" data-value="colorful">Colorful</button>
-          </div>
-          <div class="hud__swatches" aria-hidden="true">
-            <span style="--swatch: #fac800"></span>
-            <span style="--swatch: #003287"></span>
-            <span style="--swatch: #f06400"></span>
-            <span style="--swatch: #e60014"></span>
-            <span style="--swatch: #be0000"></span>
-            <span style="--swatch: #2da037"></span>
-          </div>
-        </section>
-
-        <section class="hud__controls" aria-label="Fluid parameters">
-          <article class="hud__panel hud__panel--control">
-            <div class="hud__row">
+          <section class="hud__controls" aria-label="Fluid parameters">
+            <button
+              type="button"
+              class="hud__dial"
+              data-action="radius"
+              data-control-button="radius"
+              data-state="mid"
+            >
               <span class="hud__label">Radius</span>
-              <span id="value-radius" class="hud__value">0.20</span>
-            </div>
-            <div class="hud__segmented hud__segmented--compact" data-control-group="radius">
-              <button type="button" data-action="radius" data-value="low">Low</button>
-              <button type="button" data-action="radius" data-value="mid">Mid</button>
-              <button type="button" data-action="radius" data-value="high">High</button>
-            </div>
-          </article>
+              <span class="hud__dial-level" data-control-level="radius">Mid</span>
+              <span id="value-radius" class="hud__dial-value">0.20</span>
+            </button>
 
-          <article class="hud__panel hud__panel--control">
-            <div class="hud__row">
+            <button
+              type="button"
+              class="hud__dial"
+              data-action="force"
+              data-control-button="force"
+              data-state="mid"
+            >
               <span class="hud__label">Force</span>
-              <span id="value-force" class="hud__value">6000</span>
-            </div>
-            <div class="hud__segmented hud__segmented--compact" data-control-group="force">
-              <button type="button" data-action="force" data-value="low">Low</button>
-              <button type="button" data-action="force" data-value="mid">Mid</button>
-              <button type="button" data-action="force" data-value="high">High</button>
-            </div>
-          </article>
+              <span class="hud__dial-level" data-control-level="force">Mid</span>
+              <span id="value-force" class="hud__dial-value">6000</span>
+            </button>
 
-          <article class="hud__panel hud__panel--control">
-            <div class="hud__row">
+            <button
+              type="button"
+              class="hud__dial"
+              data-action="density"
+              data-control-button="density"
+              data-state="mid"
+            >
               <span class="hud__label">Density</span>
-              <span id="value-density" class="hud__value">4.5</span>
-            </div>
-            <div class="hud__segmented hud__segmented--compact" data-control-group="density">
-              <button type="button" data-action="density" data-value="low">Low</button>
-              <button type="button" data-action="density" data-value="mid">Mid</button>
-              <button type="button" data-action="density" data-value="high">High</button>
-            </div>
-          </article>
+              <span class="hud__dial-level" data-control-level="density">Mid</span>
+              <span id="value-density" class="hud__dial-value">4.5</span>
+            </button>
 
-          <article class="hud__panel hud__panel--control">
-            <div class="hud__row">
+            <button
+              type="button"
+              class="hud__dial"
+              data-action="curl"
+              data-control-button="curl"
+              data-state="mid"
+            >
               <span class="hud__label">Curl</span>
-              <span id="value-curl" class="hud__value">3.0</span>
-            </div>
-            <div class="hud__segmented hud__segmented--compact" data-control-group="curl">
-              <button type="button" data-action="curl" data-value="low">Low</button>
-              <button type="button" data-action="curl" data-value="mid">Mid</button>
-              <button type="button" data-action="curl" data-value="high">High</button>
-            </div>
-          </article>
+              <span class="hud__dial-level" data-control-level="curl">Mid</span>
+              <span id="value-curl" class="hud__dial-value">3.0</span>
+            </button>
+          </section>
         </section>
       </aside>
     </div>
-    <script src="main.js?v=20260324-hud-5"></script>
+    <script src="main.js?v=20260325-hud-single-2"></script>
   </body>
 </html>

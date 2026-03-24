@@ -1605,7 +1605,9 @@
         p.color = tt();
       }), _.ON_DEMAND && (startRenderLoop(), scheduleIdleStop());
     }
-    t(), C(), _.IMMEDIATE && je(_.SPLAT_COUNT);
+    t(), C(), U.forEach((o) => {
+      o.color = tt();
+    }), _.IMMEDIATE && je(_.SPLAT_COUNT);
     function i() {
       _.AUTO && _.INTERVAL && !_.PAUSED && (me.push(_.SPLAT_COUNT), _.ON_DEMAND && (startRenderLoop(), scheduleIdleStop())), setTimeout(i, _.INTERVAL);
     }
@@ -1892,6 +1894,15 @@
     { name: "LU Deep Red", hex: "#BE0000" },
     { name: "LU Green", hex: "#2DA037" }
   ];
+  const TOGGLE_LABELS = {
+    theme: { light: "Light", dark: "Dark" },
+    colorMode: { white: "White", colorful: "Colorful" }
+  };
+  const TOGGLE_SEQUENCE = {
+    theme: ["light", "dark"],
+    colorMode: ["white", "colorful"]
+  };
+  const LEVEL_SEQUENCE = ["low", "mid", "high"];
   const FLUID_OPTIONS = {
     TRIGGER: "hover",
     IMMEDIATE: false,
@@ -1930,22 +1941,22 @@
   const PARAMETER_PRESETS = {
     radius: {
       option: "SPLAT_RADIUS",
-      levels: { low: 0.12, mid: 0.2, high: 0.32 },
+      levels: { low: 0.06, mid: 0.24, high: 0.96 },
       format: (value) => value.toFixed(2)
     },
     force: {
       option: "SPLAT_FORCE",
-      levels: { low: 3500, mid: 6e3, high: 9e3 },
+      levels: { low: 2e3, mid: 6500, high: 18e3 },
       format: (value) => String(value)
     },
     density: {
       option: "DENSITY_DISSIPATION",
-      levels: { low: 2.5, mid: 4.5, high: 7.5 },
+      levels: { low: 1.2, mid: 4.5, high: 14 },
       format: (value) => value.toFixed(1)
     },
     curl: {
       option: "CURL",
-      levels: { low: 1.5, mid: 3, high: 6 },
+      levels: { low: 0.8, mid: 3, high: 16 },
       format: (value) => value.toFixed(1)
     }
   };
@@ -1978,6 +1989,11 @@
       g: color.g * intensity,
       b: color.b * intensity
     };
+  }
+  function getNextValue(sequence, currentValue) {
+    const currentIndex = sequence.indexOf(currentValue);
+    const safeIndex = currentIndex === -1 ? 0 : currentIndex;
+    return sequence[(safeIndex + 1) % sequence.length];
   }
   function resolveTheme() {
     const storedTheme = window.localStorage.getItem(THEME_STORAGE_KEY);
@@ -2018,20 +2034,31 @@
   function syncHudState(state) {
     applyTheme(state.theme);
     document.documentElement.dataset.fluidColorMode = state.colorMode;
-    document.querySelectorAll("[data-control-group]").forEach((group) => {
-      const key = group.getAttribute("data-control-group");
-      const selectedValue = state[key];
-      group.querySelectorAll("button[data-value]").forEach((button) => {
-        const isActive = button.getAttribute("data-value") === selectedValue;
-        button.classList.toggle("is-active", isActive);
-        button.setAttribute("aria-pressed", String(isActive));
-      });
+    Object.entries(TOGGLE_SEQUENCE).forEach(([key]) => {
+      const button = document.querySelector(`[data-control-button="${key}"]`);
+      const value = state[key];
+      if (button instanceof HTMLButtonElement) {
+        button.dataset.state = value;
+        button.setAttribute("aria-pressed", "true");
+      }
+      const label = document.querySelector(`[data-control-value="${key}"]`);
+      if (label instanceof HTMLElement) {
+        label.textContent = TOGGLE_LABELS[key][value];
+      }
     });
     Object.entries(PARAMETER_PRESETS).forEach(([key, config]) => {
       const label = document.getElementById(`value-${key}`);
       const level = state[key];
+      const button = document.querySelector(`[data-control-button="${key}"]`);
+      const levelLabel = document.querySelector(`[data-control-level="${key}"]`);
       if (label) {
         label.textContent = config.format(config.levels[level]);
+      }
+      if (button instanceof HTMLButtonElement) {
+        button.dataset.state = level;
+      }
+      if (levelLabel instanceof HTMLElement) {
+        levelLabel.textContent = level.toUpperCase();
       }
     });
   }
@@ -2051,11 +2078,16 @@
         return;
       }
       const action = button.getAttribute("data-action");
-      const value = button.getAttribute("data-value");
-      if (!action || !value || !Object.hasOwn(state, action)) {
+      if (!action || !Object.hasOwn(state, action)) {
         return;
       }
-      state[action] = value;
+      if (action in TOGGLE_SEQUENCE) {
+        state[action] = getNextValue(TOGGLE_SEQUENCE[action], state[action]);
+      } else if (action in PARAMETER_PRESETS) {
+        state[action] = getNextValue(LEVEL_SEQUENCE, state[action]);
+      } else {
+        return;
+      }
       syncHudState(state);
       if (controller) {
         controller.setOptions(buildFluidPatch(state));
